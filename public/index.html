@@ -1119,7 +1119,7 @@
 
       // 2. Seed Cloud Firestore
       try {
-        const db = firebase.firestore();
+        const db = firebase.app().firestore('default');
         let firestoreSuccess = 0;
         const total = Object.keys(sampleProducts).length;
         Object.keys(sampleProducts).forEach(key => {
