@@ -579,7 +579,7 @@ function saveProduct() {
           .catch(e => showToast('Error Firebase RTDB', 'No se pudo guardar en Realtime Database: ' + e.message, 'danger'));
 
         // 2. Sync Firestore
-        const db = firebase.app().firestore('default');
+        const db = firebase.firestore();
         db.collection('products').doc(data.code).set(productData)
           .then(() => showToast('Firebase Firestore', 'Producto sincronizado en Firestore!', 'success'))
           .catch(e => showToast('Error Firestore', 'No se pudo guardar en Cloud Firestore: ' + e.message, 'danger'));
