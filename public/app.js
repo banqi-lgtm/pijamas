@@ -524,24 +524,24 @@ function saveProduct() {
   const isEdit = !!id;
 
   const data = {
-    code: document.getElementById('prod-code').value,
-    barcode: document.getElementById('prod-barcode').value,
-    name: document.getElementById('prod-name').value,
-    category: document.getElementById('prod-category').value,
-    brand: document.getElementById('prod-brand').value,
-    size: document.getElementById('prod-size').value,
-    color: document.getElementById('prod-color').value,
-    material: document.getElementById('prod-material').value,
-    location: document.getElementById('prod-location').value,
-    purchase_price: parseFloat(document.getElementById('prod-purchase-price').value),
-    sale_price: parseFloat(document.getElementById('prod-sale-price').value),
-    status: document.getElementById('prod-status').value,
-    min_stock: parseInt(document.getElementById('prod-min-stock').value) || 5,
-    description: document.getElementById('prod-description').value,
+    code: document.getElementById('prod-code')?.value || '',
+    barcode: document.getElementById('prod-barcode')?.value || '',
+    name: document.getElementById('prod-name')?.value || '',
+    category: document.getElementById('prod-category')?.value || '',
+    brand: document.getElementById('prod-brand')?.value || '',
+    size: document.getElementById('prod-size')?.value || '',
+    color: document.getElementById('prod-color')?.value || '',
+    material: document.getElementById('prod-material')?.value || '',
+    location: document.getElementById('prod-location')?.value || '',
+    purchase_price: parseFloat(document.getElementById('prod-purchase-price')?.value) || 0,
+    sale_price: parseFloat(document.getElementById('prod-sale-price')?.value) || 0,
+    status: document.getElementById('prod-status')?.value || 'Disponible',
+    min_stock: parseInt(document.getElementById('prod-min-stock')?.value) || 5,
+    description: document.getElementById('prod-description')?.value || '',
   };
 
   if (!isEdit) {
-    data.stock = parseInt(document.getElementById('prod-stock').value) || 0;
+    data.stock = parseInt(document.getElementById('prod-stock')?.value) || 0;
   }
 
   const url = isEdit ? `${API_BASE}/products/${id}` : `${API_BASE}/products`;
