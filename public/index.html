@@ -1048,6 +1048,84 @@
     };
     firebase.initializeApp(firebaseConfig);
     firebase.analytics();
+
+    // Auto-seed Firebase (both RTDB and Firestore)
+    window.seedFirebase = function() {
+      const sampleProducts = {
+        'PIJ-KIT-001': {
+          code: 'PIJ-KIT-001',
+          name: 'Pijama Hello Kitty Algodon Dama',
+          category: 'Pijama Dama',
+          brand: 'KITTY PIJAMAS',
+          description: 'Pijama de algodon de dos piezas super suave con diseño clasico de Hello Kitty',
+          color: 'Rosado',
+          size: 'M',
+          material: 'Algodon 100%',
+          cost_price: 35000,
+          sale_price: 75000,
+          stock: 25,
+          min_stock: 5,
+          location: 'Estanteria A-1',
+          barcode: '7701234567890'
+        },
+        'PIJ-KIT-002': {
+          code: 'PIJ-KIT-002',
+          name: 'Pijama Enteriza Termica Hello Kitty',
+          category: 'Pijama Termica',
+          brand: 'KITTY PIJAMAS',
+          description: 'Pijama enteriza termica con capucha de orejitas de Hello Kitty',
+          color: 'Blanco',
+          size: 'S',
+          material: 'Poliester Flannel',
+          cost_price: 45000,
+          sale_price: 95000,
+          stock: 15,
+          min_stock: 3,
+          location: 'Estanteria B-2',
+          barcode: '7701234567891'
+        },
+        'PIJ-KIT-003': {
+          code: 'PIJ-KIT-003',
+          name: 'Pijama Hello Kitty de Satin Dama',
+          category: 'Pijama Dama',
+          brand: 'KITTY PIJAMAS',
+          description: 'Pijama de satin de lujo manga corta y pantalon con estampado de Hello Kitty',
+          color: 'Negro',
+          size: 'L',
+          material: 'Satin de Seda',
+          cost_price: 40000,
+          sale_price: 85000,
+          stock: 20,
+          min_stock: 4,
+          location: 'Estanteria A-3',
+          barcode: '7701234567892'
+        }
+      };
+
+      console.log("Intentando poblar base de datos en Firebase...");
+      
+      // 1. Seed Realtime Database
+      try {
+        firebase.database().ref('products').set(sampleProducts)
+          .then(() => console.log("Realtime Database: Poblado exitosamente con productos de ejemplo!"))
+          .catch(e => console.warn("Realtime Database: Permiso denegado. Revisa las Reglas en la consola.", e));
+      } catch(e) { console.error(e); }
+
+      // 2. Seed Cloud Firestore
+      try {
+        const db = firebase.firestore();
+        Object.keys(sampleProducts).forEach(key => {
+          db.collection('products').doc(key).set(sampleProducts[key])
+            .then(() => console.log(`Firestore: Documento '${key}' agregado exitosamente!`))
+            .catch(e => console.warn(`Firestore: Error al agregar documento '${key}'. Revisa las Reglas.`, e));
+        });
+      } catch(e) { console.error(e); }
+    };
+
+    // Attempt to auto-seed on page load
+    setTimeout(() => {
+      window.seedFirebase();
+    }, 1000);
   </script>
   <!-- App JS Logic -->
   <script src="app.js"></script>
