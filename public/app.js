@@ -561,6 +561,33 @@ function saveProduct() {
   })
   .then(() => {
     showToast('Correcto', isEdit ? 'Producto actualizado' : 'Producto creado', 'success');
+    
+    // Sync with Firebase (Realtime Database & Cloud Firestore)
+    try {
+      if (typeof firebase !== 'undefined') {
+        const productData = { ...data };
+        if (!isEdit) {
+          productData.stock = parseInt(document.getElementById('prod-stock')?.value) || 0;
+        } else {
+          // Keep current stock if editing
+          productData.stock = data.stock || 0;
+        }
+
+        // 1. Sync RTDB
+        firebase.database().ref('products/' + data.code).set(productData)
+          .then(() => console.log('RTDB: Producto sincronizado!'))
+          .catch(e => console.error('RTDB Sync Error:', e));
+
+        // 2. Sync Firestore
+        const db = firebase.firestore();
+        db.collection('products').doc(data.code).set(productData)
+          .then(() => console.log('Firestore: Producto sincronizado!'))
+          .catch(e => console.error('Firestore Sync Error:', e));
+      }
+    } catch(err) {
+      console.warn("Fallo la sincronizacion con Firebase:", err);
+    }
+
     bootstrap.Modal.getInstance(document.getElementById('product-modal')).hide();
     loadProductsModule();
   })
