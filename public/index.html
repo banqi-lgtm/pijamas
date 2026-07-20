@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KITTY PIJAMAS - Sistema de Gestión de Pijamas Hello Kitty</title>
+  <meta name="description" content="Sistema ERP para la gestión de catálogo de pijamas, inventario (Kardex), facturación POS, clientes y reportes de KITTY PIJAMAS.">
+  <link rel="icon" type="image/png" href="logo.png">
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+  <!-- App Style -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 1. LOGIN SCREEN -->
+  <div id="login-screen" class="login-wrapper">
+    <div id="login-floating-kitties" class="floating-kitties-container"></div>
+    <div class="card erp-card" style="width: 420px; max-width: 90%; z-index: 1;">
+      <div class="text-center mb-4">
+        <div class="d-flex flex-column align-items-center mb-2">
+          <img src="logo.png" alt="Logo" class="rounded-circle mb-2" style="width: 80px; height: 80px; object-fit: cover; border: 2.5px solid var(--primary-color);">
+          <div class="h3 fw-bold text-primary">KITTY PIJAMAS ERP</div>
+        </div>
+        <p class="text-muted">Inicia sesión en la plataforma administrativa</p>
+      </div>
+      <div class="alert alert-danger d-none" id="login-alert"></div>
+      <form id="login-form">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Usuario</label>
+          <input type="text" id="login-username" class="form-control" placeholder="admin / empleado" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Contraseña</label>
+          <input type="password" id="login-password" class="form-control" placeholder="••••••••" required>
+        </div>
+        <div class="d-flex justify-content-between mb-4 align-items-center">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="remember-me">
+            <label class="form-check-label text-muted" for="remember-me">Recordarme</label>
+          </div>
+          <a href="#" class="text-decoration-none" onclick="forgotPassword()">¿Olvidó contraseña?</a>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">Ingresar al ERP</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. MAIN ERP CONTAINER -->
+  <div id="erp-container" class="app-container d-none">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <img src="logo.png" alt="Logo" class="me-2 rounded-circle" style="width: 32px; height: 32px; object-fit: cover; border: 1.5px solid var(--primary-color);">
+        <span>KITTY PIJAMAS</span>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-item active" data-target="dashboard">
+          <a href="#"><i class="fa-solid fa-chart-pie"></i>Dashboard</a>
+        </li>
+        <li class="sidebar-item" data-target="products">
+          <a href="#"><i class="fa-solid fa-tags"></i>Productos</a>
+        </li>
+        <li class="sidebar-item" data-target="inventory">
+          <a href="#"><i class="fa-solid fa-boxes-stacked"></i>Inventario (Kardex)</a>
+        </li>
+        <li class="sidebar-item" data-target="sales">
+          <a href="#"><i class="fa-solid fa-cart-shopping"></i>Ventas (POS)</a>
+        </li>
+        <li class="sidebar-item" data-target="purchases">
+          <a href="#"><i class="fa-solid fa-truck-ramp-box"></i>Compras</a>
+        </li>
+        <li class="sidebar-item" data-target="clients">
+          <a href="#"><i class="fa-solid fa-users"></i>Clientes</a>
+        </li>
+        <li class="sidebar-item" data-target="providers">
+          <a href="#"><i class="fa-solid fa-truck"></i>Proveedores</a>
+        </li>
+        <li class="sidebar-item" data-target="reports">
+          <a href="#"><i class="fa-solid fa-chart-line"></i>Reportes</a>
+        </li>
+        <li class="sidebar-item" data-target="users">
+          <a href="#"><i class="fa-solid fa-user-shield"></i>Seguridad (Logs)</a>
+        </li>
+        <li class="sidebar-item" data-target="settings">
+          <a href="#"><i class="fa-solid fa-gears"></i>Configuración</a>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+      <header>
+        <div>
+          <h4 class="fw-bold m-0" id="module-title">Dashboard Principal</h4>
+          <span class="text-muted small" style="font-size:0.8rem;">Hola, ¡Bienvenido de nuevo al ERP de KITTY PIJAMAS!</span>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <div class="input-group d-none d-md-flex" style="width: 220px;">
+            <span class="input-group-text bg-white border-end-0" style="border-radius: 0.75rem 0 0 0.75rem; border-color: var(--border-color);"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+            <input type="text" class="form-control border-start-0" placeholder="Buscar en ERP..." style="border-radius: 0 0.75rem 0.75rem 0; border-color: var(--border-color); font-size: 0.85rem;" onkeyup="globalERPSearch(this.value)">
+          </div>
+          <button class="btn btn-outline-secondary btn-sm" id="theme-toggle" onclick="toggleTheme()">
+            <i class="fa-solid fa-moon"></i> Modo Oscuro
+          </button>
+          <span class="badge bg-primary" id="user-display-role">ADMIN</span>
+          <button class="btn btn-sm btn-outline-danger" onclick="logout()" title="Cerrar Sesión">
+            <i class="fa-solid fa-right-from-bracket me-1"></i> Salir
+          </button>
+        </div>
+      </header>
+
+      <main class="content-body">
+        
+        <!-- DASHBOARD MODULE -->
+        <div id="module-dashboard" class="module-panel active">
+          <!-- Stats Grid -->
+          <div class="row">
+            <div class="col-xl-3 col-md-6 mb-2">
+              <div class="erp-card stat-card h-100 mb-0">
+                <div class="w-100">
+                  <div class="text-muted fs-7">Total Productos</div>
+                  <div class="stat-value text-indigo" id="stat-total-products">0</div>
+                  <div class="d-flex align-items-center gap-1 mt-2">
+                    <span class="badge bg-success-light text-success p-1" style="font-size: 0.72rem; font-weight: 700;"><i class="fa-solid fa-arrow-up"></i> 3.2%</span>
+                    <span class="text-muted small" style="font-size: 0.72rem;">este mes</span>
+                  </div>
+                </div>
+                <div class="stat-icon bg-primary bg-opacity-10 text-primary"><i class="fa-solid fa-tags"></i></div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-2">
+              <div class="erp-card stat-card h-100 mb-0">
+                <div class="w-100">
+                  <div class="text-muted fs-7">Stock Bajo</div>
+                  <div class="stat-value text-warning" id="stat-low-stock">0</div>
+                  <div class="d-flex align-items-center gap-1 mt-2">
+                    <span class="badge bg-warning-light text-warning p-1" style="font-size: 0.72rem; font-weight: 700;"><i class="fa-solid fa-arrow-down"></i> 12%</span>
+                    <span class="text-muted small" style="font-size: 0.72rem;">vs ayer</span>
+                  </div>
+                </div>
+                <div class="stat-icon bg-warning bg-opacity-10 text-warning"><i class="fa-solid fa-triangle-exclamation"></i></div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-2">
+              <div class="erp-card stat-card h-100 mb-0">
+                <div class="w-100">
+                  <div class="text-muted fs-7">Productos Agotados</div>
+                  <div class="stat-value text-danger" id="stat-out-of-stock">0</div>
+                  <div class="d-flex align-items-center gap-1 mt-2">
+                    <span class="badge bg-danger-light text-danger p-1" style="font-size: 0.72rem; font-weight: 700;"><i class="fa-solid fa-arrow-up"></i> +1 nuevo</span>
+                    <span class="text-muted small" style="font-size: 0.72rem;">hoy</span>
+                  </div>
+                </div>
+                <div class="stat-icon bg-danger bg-opacity-10 text-danger"><i class="fa-solid fa-circle-xmark"></i></div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-2">
+              <div class="erp-card stat-card h-100 mb-0">
+                <div class="w-100">
+                  <div class="text-muted fs-7">Valor Inventario</div>
+                  <div class="stat-value text-success" id="stat-inventory-val">$0</div>
+                  <div class="d-flex align-items-center gap-1 mt-2">
+                    <span class="badge bg-success-light text-success p-1" style="font-size: 0.72rem; font-weight: 700;"><i class="fa-solid fa-arrow-up"></i> 5.4%</span>
+                    <span class="text-muted small" style="font-size: 0.72rem;">valorización</span>
+                  </div>
+                </div>
+                <div class="stat-icon bg-success bg-opacity-10 text-success"><i class="fa-solid fa-dollar-sign"></i></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts & Main Area -->
+          <div class="row align-items-stretch">
+            <div class="col-md-8">
+              <div class="erp-card h-100 mb-0 d-flex flex-column justify-content-between">
+                <div>
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-line me-2"></i>Historial de Ventas</h5>
+                    <div class="d-flex gap-2">
+                      <select class="form-select form-select-sm" style="width: 140px; font-size: 0.8rem; border-color: var(--border-color);">
+                        <option value="30">Últimos 30 días</option>
+                        <option value="7">Últimos 7 días</option>
+                        <option value="12">Este año</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div style="position: relative; height: 160px; width: 100%;">
+                    <canvas id="salesChart"></canvas>
+                  </div>
+                </div>
+                <!-- 3 Mini-Métricas Resumen -->
+                <div class="row mt-2 pt-2 border-top g-2">
+                  <div class="col-4 border-end text-center">
+                    <span class="text-muted small" style="font-size: 0.72rem;">Ventas Totales</span>
+                    <h6 class="fw-bold mt-0 mb-0 text-primary" id="summary-total-sales" style="font-size: 0.95rem;">$0</h6>
+                  </div>
+                  <div class="col-4 border-end text-center">
+                    <span class="text-muted small" style="font-size: 0.72rem;">Ticket Promedio</span>
+                    <h6 class="fw-bold mt-0 mb-0 text-primary" id="summary-average-ticket" style="font-size: 0.95rem;">$0</h6>
+                  </div>
+                  <div class="col-4 text-center">
+                    <span class="text-muted small" style="font-size: 0.72rem;">Transacciones</span>
+                    <h6 class="fw-bold mt-0 mb-0 text-primary" id="summary-total-transactions" style="font-size: 0.95rem;">0</h6>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="erp-card h-100 mb-0 d-flex flex-column justify-content-between p-3">
+                <h5 class="fw-bold mb-3"><i class="fa-solid fa-bolt text-primary me-2"></i>Accesos Rápidos</h5>
+                <div class="row g-2 flex-grow-1 align-content-stretch">
+                  <div class="col-6">
+                    <div class="erp-card text-center p-2 h-100 mb-0 btn-quick-access d-flex flex-column justify-content-center align-items-center" onclick="loadModule('sales')" style="cursor: pointer; border-radius: 12px; min-height: 80px;">
+                      <div class="stat-icon bg-primary bg-opacity-10 text-primary mb-1" style="width: 34px; height: 34px; font-size: 1rem;"><i class="fa-solid fa-cart-shopping"></i></div>
+                      <h6 class="fw-bold mb-0" style="font-size: 0.78rem;">Nueva Venta</h6>
+                      <p class="text-muted small mb-0" style="font-size: 0.65rem; line-height: 1.1;">Generar POS</p>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="erp-card text-center p-2 h-100 mb-0 btn-quick-access d-flex flex-column justify-content-center align-items-center" onclick="openAddProductModal()" style="cursor: pointer; border-radius: 12px; min-height: 80px;">
+                      <div class="stat-icon bg-primary bg-opacity-10 text-primary mb-1" style="width: 34px; height: 34px; font-size: 1rem;"><i class="fa-solid fa-plus"></i></div>
+                      <h6 class="fw-bold mb-0" style="font-size: 0.78rem;">Crear Pijama</h6>
+                      <p class="text-muted small mb-0" style="font-size: 0.65rem; line-height: 1.1;">Nuevo Item</p>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="erp-card text-center p-2 h-100 mb-0 btn-quick-access d-flex flex-column justify-content-center align-items-center" onclick="openInventoryMoveModal()" style="cursor: pointer; border-radius: 12px; min-height: 80px;">
+                      <div class="stat-icon bg-primary bg-opacity-10 text-primary mb-1" style="width: 34px; height: 34px; font-size: 1rem;"><i class="fa-solid fa-right-left"></i></div>
+                      <h6 class="fw-bold mb-0" style="font-size: 0.78rem;">Kardex</h6>
+                      <p class="text-muted small mb-0" style="font-size: 0.65rem; line-height: 1.1;">Mover Stock</p>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="erp-card text-center p-2 h-100 mb-0 btn-quick-access d-flex flex-column justify-content-center align-items-center" onclick="loadModule('reports')" style="cursor: pointer; border-radius: 12px; min-height: 80px;">
+                      <div class="stat-icon bg-primary bg-opacity-10 text-primary mb-1" style="width: 34px; height: 34px; font-size: 1rem;"><i class="fa-solid fa-chart-line"></i></div>
+                      <h6 class="fw-bold mb-0" style="font-size: 0.78rem;">Reportes</h6>
+                      <p class="text-muted small mb-0" style="font-size: 0.65rem; line-height: 1.1;">Exportar PDF</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRODUCTS MODULE (Split layout: Catálogo + Inventario) -->
+        <div id="module-products" class="module-panel">
+          <div class="row g-3 align-items-stretch">
+            
+            <!-- Left Panel: Catálogo de Pijamas -->
+            <div class="col-12 mb-3">
+              <div class="erp-card mb-0 d-flex flex-column">
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h5 class="fw-bold mb-0 d-flex align-items-center" style="font-size: 1.05rem;">
+                    <button class="btn btn-sm btn-link text-primary p-0 me-2" onclick="toggleCollapse('catalog-card-body', this)" style="box-shadow: none;"><i class="fa-solid fa-chevron-down"></i></button>
+                    <i class="fa-solid fa-shirt me-2 text-primary"></i>Catálogo de Pijamas
+                  </h5>
+                  <div class="d-flex gap-1">
+                    <button class="btn btn-sm btn-outline-primary" onclick="openCategoriesModal()"><i class="fa-solid fa-list"></i> Categorías</button>
+                    <button class="btn btn-sm btn-outline-success" onclick="openExcelImport()"><i class="fa-solid fa-file-excel"></i> Importar</button>
+                    <button class="btn btn-sm btn-primary" onclick="openAddProductModal()"><i class="fa-solid fa-plus"></i> + Pijama</button>
+                  </div>
+                </div>
+                
+                <div id="catalog-card-body" style="display: none;">
+                  <!-- Filters -->
+                  <div class="p-2 mb-3 bg-light" style="border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div class="row g-1">
+                      <div class="col-4">
+                        <select class="form-select form-select-sm" id="filter-category" onchange="applyProductFilters()">
+                          <option value="">Categoría: Todos</option>
+                        </select>
+                      </div>
+                      <div class="col-3">
+                        <select class="form-select form-select-sm" id="filter-size" onchange="applyProductFilters()">
+                          <option value="">Talla: Todos</option>
+                          <option value="XS">XS</option>
+                          <option value="S">S</option>
+                          <option value="M">M</option>
+                          <option value="L">L</option>
+                          <option value="XL">XL</option>
+                          <option value="XXL">XXL</option>
+                          <option value="8">Talla 8</option>
+                          <option value="10">Talla 10</option>
+                          <option value="12M">12M</option>
+                        </select>
+                      </div>
+                      <div class="col-5">
+                        <input type="text" class="form-control form-control-sm" id="search-product-input" placeholder="Buscar..." onkeyup="applyProductFilters()">
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Table -->
+                  <div class="table-responsive flex-grow-1">
+                    <table id="products-table" class="table table-hover table-sm w-100 align-middle" style="font-size: 0.85rem;">
+                      <thead>
+                        <tr>
+                          <th>Código</th>
+                          <th>Nombre</th>
+                          <th>Categoría</th>
+                          <th>Talla</th>
+                          <th>Color</th>
+                          <th>P. Venta</th>
+                          <th>Existencias</th>
+                          <th>Estado</th>
+                          <th>Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody id="products-table-body"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Panel: Movimientos de Inventario (Kardex) -->
+            <div class="col-12">
+              <div class="erp-card mb-0 d-flex flex-column">
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h5 class="fw-bold mb-0 d-flex align-items-center" style="font-size: 1.05rem;">
+                    <button class="btn btn-sm btn-link text-primary p-0 me-2" onclick="toggleCollapse('kardex-card-body', this)" style="box-shadow: none;"><i class="fa-solid fa-chevron-down"></i></button>
+                    <i class="fa-solid fa-boxes-stacked me-2 text-primary"></i>Kardex (Inventario)
+                  </h5>
+                  <button class="btn btn-sm btn-primary" onclick="openInventoryMoveModal()"><i class="fa-solid fa-right-left"></i> + Movimiento</button>
+                </div>
+                
+                <div id="kardex-card-body" style="display: none;">
+                  <!-- Table -->
+                  <div class="table-responsive flex-grow-1">
+                    <table id="kardex-table" class="table table-hover table-sm w-100 align-middle" style="font-size: 0.82rem;">
+                      <thead>
+                        <tr>
+                          <th>Fecha</th>
+                          <th>Código</th>
+                          <th>Producto</th>
+                          <th>Tipo</th>
+                          <th>Cantidad</th>
+                          <th>Motivo / Referencia</th>
+                          <th>Usuario</th>
+                        </tr>
+                      </thead>
+                      <tbody id="kardex-table-body"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+
+        <!-- SALES (POS) MODULE -->
+        <div id="module-sales" class="module-panel">
+          <div class="pos-container">
+            <!-- Left Side: POS Cart / Product selection -->
+            <div class="erp-card">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0"><i class="fa-solid fa-cash-register me-2"></i>Punto de Venta (POS)</h5>
+                <button class="btn btn-outline-primary btn-sm" onclick="triggerBarcodeScanSimulation()"><i class="fa-solid fa-barcode me-2"></i>Escanear Código de Barras (Simulado)</button>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Buscar Pijama</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+                  <input type="text" class="form-control" id="pos-product-search" placeholder="Escriba código o nombre de la pijama para agregar..." oninput="searchPosProducts(this.value)">
+                </div>
+                <div class="list-group dropdown-menu w-100 shadow" id="pos-search-results" style="display:none; max-height:250px; overflow-y:auto;">
+                  <!-- Results dynamically appended -->
+                </div>
+              </div>
+              <div class="table-responsive" style="max-height: 400px;">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Pijama</th>
+                      <th>Talla/Color</th>
+                      <th>Precio Unit.</th>
+                      <th style="width: 120px;">Cant.</th>
+                      <th>Total</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="pos-cart-body">
+                    <!-- Items -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Right Side: Totals / Customer selection -->
+            <div class="erp-card">
+              <h5 class="fw-bold mb-3"><i class="fa-solid fa-receipt me-2"></i>Facturación y Pago</h5>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Cliente</label>
+                <select class="form-select" id="pos-client-select">
+                  <!-- Filled dynamically -->
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Método de Pago</label>
+                <select class="form-select" id="pos-payment-method">
+                  <option value="Efectivo">Efectivo</option>
+                  <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
+                  <option value="Transferencia">Transferencia Bancaria</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Descuento ($)</label>
+                <input type="number" class="form-control" id="pos-discount" value="0" min="0" oninput="recalculatePosTotals()">
+              </div>
+              <hr>
+              <div class="d-flex justify-content-between mb-2">
+                <span>Subtotal:</span>
+                <span id="pos-subtotal">$0</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span>IVA Incluido (19%):</span>
+                <span id="pos-tax">$0</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2 text-danger">
+                <span>Descuento:</span>
+                <span id="pos-discount-val">-$0</span>
+              </div>
+              <div class="d-flex justify-content-between mb-3 fw-bold fs-5 text-primary">
+                <span>Total a Pagar:</span>
+                <span id="pos-total">$0</span>
+              </div>
+              <button class="btn btn-success w-100 py-3 fw-bold" onclick="processPOSSale()"><i class="fa-solid fa-file-invoice-dollar me-2"></i>GENERAR FACTURA</button>
+            </div>
+          </div>
+
+          <!-- Sales History Card below POS -->
+          <div class="erp-card mt-3">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-clock-rotate-left me-2"></i>Historial de Facturas Emitidas</h5>
+            <div class="table-responsive">
+              <table id="sales-history-table" class="table table-hover w-100">
+                <thead>
+                  <tr>
+                    <th>Factura No.</th>
+                    <th>Fecha</th>
+                    <th>Cliente</th>
+                    <th>Método Pago</th>
+                    <th>Total</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="sales-history-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- PURCHASES MODULE -->
+        <div id="module-purchases" class="module-panel">
+          <div class="d-flex justify-content-between mb-3 align-items-center">
+            <h5 class="fw-bold mb-0"><i class="fa-solid fa-truck-ramp-box me-2"></i>Órdenes de Compra y Reabastecimiento</h5>
+            <button class="btn btn-primary" onclick="openNewPurchaseModal()"><i class="fa-solid fa-plus me-2"></i>Registrar Compra</button>
+          </div>
+          <div class="erp-card">
+            <div class="table-responsive">
+              <table id="purchases-table" class="table table-hover w-100">
+                <thead>
+                  <tr>
+                    <th>Orden No.</th>
+                    <th>Fecha</th>
+                    <th>Proveedor</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody id="purchases-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- CLIENTS MODULE -->
+        <div id="module-clients" class="module-panel">
+          <div class="d-flex justify-content-between mb-3 align-items-center">
+            <h5 class="fw-bold mb-0"><i class="fa-solid fa-users me-2"></i>Gestión de Clientes</h5>
+            <button class="btn btn-primary" onclick="openAddClientModal()"><i class="fa-solid fa-plus me-2"></i>Agregar Cliente</button>
+          </div>
+          <div class="erp-card">
+            <div class="table-responsive">
+              <table id="clients-table" class="table table-hover w-100">
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Dirección</th>
+                    <th>Saldo Pendiente</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="clients-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROVIDERS MODULE -->
+        <div id="module-providers" class="module-panel">
+          <div class="d-flex justify-content-between mb-3 align-items-center">
+            <h5 class="fw-bold mb-0"><i class="fa-solid fa-truck me-2"></i>Gestión de Proveedores</h5>
+            <button class="btn btn-primary" onclick="openAddProviderModal()"><i class="fa-solid fa-plus me-2"></i>Agregar Proveedor</button>
+          </div>
+          <div class="erp-card">
+            <div class="table-responsive">
+              <table id="providers-table" class="table table-hover w-100">
+                <thead>
+                  <tr>
+                    <th>Empresa</th>
+                    <th>Contacto</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>Dirección</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="providers-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- REPORTS MODULE -->
+        <div id="module-reports" class="module-panel">
+          <h5 class="fw-bold mb-3"><i class="fa-solid fa-chart-line me-2"></i>Informes del Sistema</h5>
+          <div class="row">
+            <!-- Valuation -->
+            <div class="col-md-6 col-lg-4">
+              <div class="erp-card text-center p-4">
+                <i class="fa-solid fa-dollar-sign text-success fs-2 mb-3"></i>
+                <h6 class="fw-bold">Reporte de Inventario</h6>
+                <p class="text-muted small">Costo total de stock actual, cantidades de existencias y valor comercial.</p>
+                <button class="btn btn-primary btn-sm" onclick="exportReport('inventory', 'csv')"><i class="fa-solid fa-file-csv me-2"></i>Exportar CSV</button>
+              </div>
+            </div>
+            <!-- Sales -->
+            <div class="col-md-6 col-lg-4">
+              <div class="erp-card text-center p-4">
+                <i class="fa-solid fa-basket-shopping text-primary fs-2 mb-3"></i>
+                <h6 class="fw-bold">Reporte de Ventas</h6>
+                <p class="text-muted small">Historial de ventas agrupadas, desglose de impuestos y utilidades.</p>
+                <button class="btn btn-primary btn-sm" onclick="exportReport('sales', 'csv')"><i class="fa-solid fa-file-csv me-2"></i>Exportar CSV</button>
+              </div>
+            </div>
+            <!-- Audit -->
+            <div class="col-md-6 col-lg-4">
+              <div class="erp-card text-center p-4">
+                <i class="fa-solid fa-chart-bar text-warning fs-2 mb-3"></i>
+                <h6 class="fw-bold">Movimientos de Inventario</h6>
+                <p class="text-muted small">Exportación del Kardex de transacciones de entradas y salidas.</p>
+                <button class="btn btn-primary btn-sm" onclick="exportReport('kardex', 'csv')"><i class="fa-solid fa-file-csv me-2"></i>Exportar CSV</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- USERS & AUDIT MODULE -->
+        <div id="module-users" class="module-panel">
+          <h5 class="fw-bold mb-3"><i class="fa-solid fa-user-shield me-2"></i>Seguridad y Auditoría del Sistema</h5>
+          <div class="erp-card">
+            <h6 class="fw-bold mb-3">Registro de Actividad (Logs)</h6>
+            <div class="table-responsive">
+              <table id="audit-logs-table" class="table table-hover table-sm">
+                <thead>
+                  <tr>
+                    <th>Fecha y Hora</th>
+                    <th>Usuario</th>
+                    <th>Acción</th>
+                    <th>Detalles</th>
+                  </tr>
+                </thead>
+                <tbody id="audit-logs-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONFIGURATION MODULE -->
+        <div id="module-settings" class="module-panel">
+          <h5 class="fw-bold mb-3"><i class="fa-solid fa-gears me-2"></i>Configuración de la Empresa</h5>
+          <div class="row">
+            <div class="col-md-8">
+              <div class="erp-card">
+                <form id="settings-form">
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label fw-semibold">Nombre de la Tienda</label>
+                      <input type="text" class="form-control" name="company_name">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label fw-semibold">NIT / RUT</label>
+                      <input type="text" class="form-control" name="company_nit">
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label fw-semibold">Teléfono</label>
+                      <input type="text" class="form-control" name="company_phone">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label fw-semibold">Correo de Contacto</label>
+                      <input type="email" class="form-control" name="company_email">
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold">Dirección</label>
+                    <input type="text" class="form-control" name="company_address">
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label fw-semibold">Moneda</label>
+                      <input type="text" class="form-control" name="currency">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label fw-semibold">Impuesto (%)</label>
+                      <input type="number" class="form-control" name="tax_rate">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label fw-semibold">Prefijo Facturas</label>
+                      <input type="text" class="form-control" name="invoice_prefix">
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary fw-semibold"><i class="fa-solid fa-floppy-disk me-2"></i>Guardar Ajustes</button>
+                </form>
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="erp-card">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-database me-2"></i>Copias de Seguridad</h6>
+                <p class="text-muted small">Cree respaldos de la base de datos o restaure la información del sistema a partir de una versión anterior.</p>
+                <div class="d-grid gap-2">
+                  <button class="btn btn-outline-primary" onclick="executeBackup()"><i class="fa-solid fa-download me-2"></i>Generar Backup</button>
+                  <button class="btn btn-outline-danger" onclick="executeRestore()"><i class="fa-solid fa-rotate-left me-2"></i>Restaurar Sistema</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATIONS CONTAINER -->
+  <div class="toast-container-fixed" id="toast-container"></div>
+
+  <!-- 3. MODALS -->
+
+  <!-- PRODUCT MODAL (Create/Edit) -->
+  <div class="modal fade" id="product-modal" tabindex="-1" style="backdrop-filter: blur(5px);">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content border-0" style="border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.15);">
+        <form id="product-form">
+          <input type="hidden" id="product-id">
+          <!-- Header del modal con degradado rosa/fucsia -->
+          <div class="modal-header d-flex align-items-center justify-content-between p-4 border-0" style="background: linear-gradient(135deg, #e91e63, #c2185b); color: white;">
+            <div class="d-flex align-items-center gap-3">
+              <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 46px; height: 46px; font-size: 1.4rem; flex-shrink: 0;">
+                <i class="fa-solid fa-shirt"></i>
+              </div>
+              <div>
+                <h5 class="modal-title fw-bold m-0" id="product-modal-title" style="font-size: 1.2rem; letter-spacing: -0.5px;">Registrar Nueva Pijama</h5>
+                <span style="font-size: 0.75rem; opacity: 0.85;">Completa la información del producto</span>
+              </div>
+            </div>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" style="margin: 0;"></button>
+          </div>
+          <div class="modal-body p-4">
+            <!-- Row 1: Codigo, Codigo de barras, Categoria -->
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label fw-semibold">Código <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <input type="text" id="prod-code" class="form-control" placeholder="Ej: PJA-0001" required>
+                  <button class="btn btn-outline-primary fw-semibold px-2" type="button" onclick="generateRandomProductCode()" style="border-color: #fce4ec;"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label fw-semibold">Código de Barras</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-white border-end-0" style="border-color: var(--border-color);"><i class="fa-solid fa-barcode text-muted"></i></span>
+                  <input type="text" id="prod-barcode" class="form-control border-start-0" placeholder="Escanea o ingresa el código">
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label fw-semibold">Categoría <span class="text-danger">*</span></label>
+                <select id="prod-category" class="form-select" required></select>
+              </div>
+            </div>
+
+            <!-- Row 2: Nombre del Producto, Marca -->
+            <div class="row">
+              <div class="col-md-8 mb-3">
+                <label class="form-label fw-semibold">Nombre del Producto <span class="text-danger">*</span></label>
+                <input type="text" id="prod-name" class="form-control" placeholder="Ej: Pijama Satin Elegance Dama" required>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label fw-semibold">Marca</label>
+                <input type="text" id="prod-brand" class="form-control" placeholder="Ej: KITTY PIJAMAS">
+              </div>
+            </div>
+
+            <!-- Row 3: Talla, Color, Material, Ubicacion -->
+            <div class="row">
+              <div class="col-md-3 mb-3">
+                <label class="form-label fw-semibold">Talla <span class="text-danger">*</span></label>
+                <select id="prod-size" class="form-select" required>
+                  <option value="XS">XS</option>
+                  <option value="S">S</option>
+                  <option value="M">M</option>
+                  <option value="L">L</option>
+                  <option value="XL">XL</option>
+                  <option value="XXL">XXL</option>
+                  <option value="8">Talla 8</option>
+                  <option value="10">Talla 10</option>
+                  <option value="12M">12M</option>
+                </select>
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label fw-semibold">Color</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-white border-end-0" style="border-color: var(--border-color);"><i class="fa-solid fa-circle text-primary" style="font-size: 0.8rem;"></i></span>
+                  <input type="text" id="prod-color" class="form-control border-start-0" placeholder="Ej: Rosado">
+                </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label fw-semibold">Material</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-white border-end-0" style="border-color: var(--border-color);"><i class="fa-solid fa-scroll text-muted"></i></span>
+                  <input type="text" id="prod-material" class="form-control border-start-0" placeholder="Ej: Satín, Algodón">
+                </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label fw-semibold">Ubicación en Bodega</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-white border-end-0" style="border-color: var(--border-color);"><i class="fa-solid fa-location-dot text-muted"></i></span>
+                  <input type="text" id="prod-location" class="form-control border-start-0" placeholder="Ej: Estantería B-3">
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 4: Precio Compra, Precio Venta, Estado, Existencia, Stock Min -->
+            <div class="row">
+              <div class="col-md-3 mb-3">
+                <label class="form-label fw-semibold">Precio Compra <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-white border-end-0" style="border-color: var(--border-color);"><i class="fa-solid fa-dollar-sign text-muted" style="font-size: 0.8rem;"></i></span>
+                  <input type="number" id="prod-purchase-price" class="form-control border-start-0" placeholder="0,00" min="0" required>
+                </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label fw-semibold">Precio Venta <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-white border-end-0" style="border-color: var(--border-color);"><i class="fa-solid fa-tag text-muted" style="font-size: 0.8rem;"></i></span>
+                  <input type="number" id="prod-sale-price" class="form-control border-start-0" placeholder="0,00" min="0" required>
+                </div>
+              </div>
+              <div class="col-md-2 mb-3">
+                <label class="form-label fw-semibold">Estado <span class="text-danger">*</span></label>
+                <select id="prod-status" class="form-select px-1" required>
+                  <option value="Disponible">🟢 Disp.</option>
+                  <option value="Agotado">🔴 Agot.</option>
+                  <option value="Descontinuado">⚫ Desc.</option>
+                </select>
+              </div>
+              <div class="col-md-2 mb-3">
+                <label class="form-label fw-semibold">Exist. Inicial</label>
+                <input type="number" id="prod-stock" class="form-control" placeholder="0" min="0">
+              </div>
+              <div class="col-md-2 mb-3">
+                <label class="form-label fw-semibold">Stock Mín.</label>
+                <input type="number" id="prod-min-stock" class="form-control" placeholder="5" min="0" value="5">
+              </div>
+            </div>
+
+            <!-- Banner de nota informativa -->
+            <div class="d-flex align-items-center gap-2 p-2 mt-1" style="background-color: var(--bg-sidebar-hover); border-radius: 8px;">
+              <i class="fa-solid fa-circle-info text-primary fs-6"></i>
+              <span class="small text-muted" style="font-size: 0.75rem;"><strong>Importante:</strong> Los campos marcados con <span class="text-danger">*</span> son obligatorios.</span>
+            </div>
+          </div>
+          <div class="modal-footer border-0 p-4 pt-0">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius: 8px;">Cancelar</button>
+            <button type="submit" class="btn btn-primary fw-semibold" style="border-radius: 8px;"><i class="fa-solid fa-floppy-disk me-1"></i> Guardar Pijama</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- INVENTORY TRANSACTION MODAL -->
+  <div class="modal fade" id="inventory-move-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content border-0">
+        <form id="inventory-move-form">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title fw-bold">Registrar Transacción de Inventario</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Producto</label>
+              <select id="inv-product-select" class="form-select" required></select>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-semibold">Tipo de Movimiento</label>
+                <select id="inv-type" class="form-select" required>
+                  <option value="Entrada">Entrada (Abastecimiento)</option>
+                  <option value="Salida">Salida (Merma / Retiro)</option>
+                  <option value="Ajuste">Ajuste (Corrección)</option>
+                </select>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-semibold">Cantidad</label>
+                <input type="number" id="inv-quantity" class="form-control" min="1" required>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Motivo del Ajuste</label>
+              <textarea id="inv-reason" class="form-control" rows="2" placeholder="Describa el por qué del movimiento..." required></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <button type="submit" class="btn btn-primary">Registrar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXCEL IMPORT MODAL -->
+  <div class="modal fade" id="excel-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content border-0">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title fw-bold"><i class="fa-solid fa-file-excel me-2"></i>Carga Masiva desde Excel</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p class="small text-muted">Seleccione un archivo de excel o CSV para cargar masivamente sus referencias de pijamas en la base de datos.</p>
+          
+          <div class="mb-4 excel-template-box">
+            <h6 class="fw-bold mb-2"><i class="fa-solid fa-download me-2"></i>¿No tienes la estructura?</h6>
+            <p class="small mb-3">Descarga nuestra plantilla estructurada lista para rellenar en Excel y subir aquí.</p>
+            <button type="button" class="btn btn-sm btn-success w-100" onclick="downloadCSVTemplate()">
+              <i class="fa-solid fa-file-excel me-2"></i>Descargar Plantilla Excel (.xlsx)
+            </button>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Seleccionar Archivo</label>
+            <input type="file" class="form-control" accept=".csv,.xlsx,.xls" id="excel-file-input">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-success" onclick="simulateExcelImport()">Procesar Carga</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PURCHASE ORDER MODAL -->
+  <div class="modal fade" id="purchase-modal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content border-0">
+        <form id="purchase-form">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title fw-bold">Registrar Compra a Proveedor</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Proveedor</label>
+              <select id="purch-provider-select" class="form-select" required></select>
+            </div>
+            <h6 class="fw-bold mt-4 mb-3 border-bottom pb-2">Items a Solicitar</h6>
+            <div id="purch-items-list" class="mb-3">
+              <!-- Dynamically added rows -->
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addPurchaseItemRow()"><i class="fa-solid fa-plus me-1"></i>Añadir Item</button>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Registrar Compra</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLIENT MODAL (Create/Edit) -->
+  <div class="modal fade" id="client-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content border-0">
+        <form id="client-form">
+          <input type="hidden" id="client-id">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title fw-bold" id="client-modal-title">Registrar Cliente</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Nombre Completo *</label>
+              <input type="text" id="client-name" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Email</label>
+              <input type="email" id="client-email" class="form-control">
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Teléfono</label>
+              <input type="text" id="client-phone" class="form-control">
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Dirección</label>
+              <input type="text" id="client-address" class="form-control">
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Saldo Pendiente ($)</label>
+              <input type="number" id="client-balance" class="form-control" value="0" min="0">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROVIDER MODAL (Create/Edit) -->
+  <div class="modal fade" id="provider-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content border-0">
+        <form id="provider-form">
+          <input type="hidden" id="provider-id">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title fw-bold" id="provider-modal-title">Registrar Proveedor</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Nombre / Razón Social *</label>
+              <input type="text" id="prov-name" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Nombre del Contacto</label>
+              <input type="text" id="prov-contact" class="form-control">
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Teléfono</label>
+              <input type="text" id="prov-phone" class="form-control">
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Email</label>
+              <input type="email" id="prov-email" class="form-control">
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Dirección</label>
+              <input type="text" id="prov-address" class="form-control">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- CATEGORIES MODAL (Manage categories) -->
+  <div class="modal fade" id="categories-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content border-0">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold">Gestionar Categorías</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="category-add-form" class="mb-4">
+            <label class="form-label fw-semibold">Nueva Categoría</label>
+            <div class="input-group">
+              <input type="text" id="new-category-name" class="form-control" placeholder="Ej: Babuchas, Cobijas" required>
+              <button class="btn btn-primary" type="submit">Agregar</button>
+            </div>
+          </form>
+          <h6 class="fw-bold border-bottom pb-2">Categorías Existentes</h6>
+          <div style="max-height: 250px; overflow-y: auto;">
+            <ul class="list-group" id="categories-list-group">
+              <!-- Dynamically loaded -->
+            </ul>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRINT TICKET SIMULATION AREA -->
+  <div id="print-ticket-area" style="display:none;"></div>
+
+  <!-- JS Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- SheetJS to generate structured Excel files -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- Firebase SDK Compat -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyC7BXrTD9ebqDvTTcn7uI-kBcG34cNfrmQ",
+      authDomain: "kittypijamas-20631.firebaseapp.com",
+      projectId: "kittypijamas-20631",
+      storageBucket: "kittypijamas-20631.firebasestorage.app",
+      messagingSenderId: "59242228883",
+      appId: "1:59242228883:web:59b1a5f6509cb539117166",
+      measurementId: "G-G5SHNYL0XE"
+    };
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+  </script>
+  <!-- App JS Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
