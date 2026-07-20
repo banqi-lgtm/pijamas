@@ -508,10 +508,13 @@ function openEditProduct(id) {
   document.getElementById('prod-sale-price').value = p.sale_price;
   document.getElementById('prod-status').value = p.status;
   document.getElementById('prod-min-stock').value = p.min_stock;
-  document.getElementById('prod-description').value = p.description || '';
+  
+  const descEl = document.getElementById('prod-description');
+  if (descEl) descEl.value = p.description || '';
 
   // Hide initial stock input when editing
-  document.getElementById('prod-stock').parentElement.style.display = 'none';
+  const stockParent = document.getElementById('prod-stock')?.parentElement;
+  if (stockParent) stockParent.style.display = 'none';
 
   document.getElementById('product-modal-title').innerText = 'Modificar Pijama';
   
