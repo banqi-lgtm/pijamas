@@ -575,17 +575,18 @@ function saveProduct() {
 
         // 1. Sync RTDB
         firebase.database().ref('products/' + data.code).set(productData)
-          .then(() => console.log('RTDB: Producto sincronizado!'))
-          .catch(e => console.error('RTDB Sync Error:', e));
+          .then(() => showToast('Firebase RTDB', 'Producto sincronizado en la nube!', 'success'))
+          .catch(e => showToast('Error Firebase RTDB', 'No se pudo guardar en Realtime Database: ' + e.message, 'danger'));
 
         // 2. Sync Firestore
         const db = firebase.firestore();
         db.collection('products').doc(data.code).set(productData)
-          .then(() => console.log('Firestore: Producto sincronizado!'))
-          .catch(e => console.error('Firestore Sync Error:', e));
+          .then(() => showToast('Firebase Firestore', 'Producto sincronizado en Firestore!', 'success'))
+          .catch(e => showToast('Error Firestore', 'No se pudo guardar en Cloud Firestore: ' + e.message, 'danger'));
       }
     } catch(err) {
       console.warn("Fallo la sincronizacion con Firebase:", err);
+      showToast('Error Firebase', err.message, 'danger');
     }
 
     bootstrap.Modal.getInstance(document.getElementById('product-modal')).hide();

@@ -1107,17 +1107,34 @@
       // 1. Seed Realtime Database
       try {
         firebase.database().ref('products').set(sampleProducts)
-          .then(() => console.log("Realtime Database: Poblado exitosamente con productos de ejemplo!"))
-          .catch(e => console.warn("Realtime Database: Permiso denegado. Revisa las Reglas en la consola.", e));
+          .then(() => {
+            console.log("Realtime Database: Poblado exitosamente con productos de ejemplo!");
+            if (typeof showToast !== 'undefined') showToast('Firebase RTDB', '¡Productos de ejemplo sincronizados!', 'success');
+          })
+          .catch(e => {
+            console.warn("Realtime Database Error:", e);
+            if (typeof showToast !== 'undefined') showToast('Error Firebase RTDB', 'Fallo al guardar: ' + e.message, 'danger');
+          });
       } catch(e) { console.error(e); }
 
       // 2. Seed Cloud Firestore
       try {
         const db = firebase.firestore();
+        let firestoreSuccess = 0;
+        const total = Object.keys(sampleProducts).length;
         Object.keys(sampleProducts).forEach(key => {
           db.collection('products').doc(key).set(sampleProducts[key])
-            .then(() => console.log(`Firestore: Documento '${key}' agregado exitosamente!`))
-            .catch(e => console.warn(`Firestore: Error al agregar documento '${key}'. Revisa las Reglas.`, e));
+            .then(() => {
+              firestoreSuccess++;
+              if (firestoreSuccess === total) {
+                console.log("Firestore: Poblado exitosamente!");
+                if (typeof showToast !== 'undefined') showToast('Firebase Firestore', '¡Productos de ejemplo sincronizados!', 'success');
+              }
+            })
+            .catch(e => {
+              console.warn("Firestore Error:", e);
+              if (typeof showToast !== 'undefined') showToast('Error Firestore', `Fallo al guardar '${key}': ` + e.message, 'danger');
+            });
         });
       } catch(e) { console.error(e); }
     };
