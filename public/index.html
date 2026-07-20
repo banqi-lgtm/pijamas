@@ -1047,7 +1047,11 @@
       measurementId: "G-G5SHNYL0XE"
     };
     firebase.initializeApp(firebaseConfig);
-    firebase.analytics();
+    try {
+      firebase.analytics();
+    } catch(e) {
+      console.warn("Firebase Analytics no inicializado (normal si hay AdBlocker):", e);
+    }
 
     // Auto-seed Firebase (both RTDB and Firestore)
     window.seedFirebase = function() {
