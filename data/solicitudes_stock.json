@@ -1,0 +1,20 @@
+[
+  {
+    "id": "STK-1788743879106",
+    "nombre": "Walter Test",
+    "correo": "test@empresa.com",
+    "telefono": "",
+    "referencia": "SKM100GB128D",
+    "cantidad": 2,
+    "fecha": "2026-09-07T01:17:59.107Z"
+  },
+  {
+    "id": "STK-1788745242212",
+    "nombre": "Prueba Test",
+    "correo": "test@alfa.com",
+    "telefono": "",
+    "referencia": "Danfoss FC-302",
+    "cantidad": 2,
+    "fecha": "2026-09-07T01:40:42.212Z"
+  }
+]

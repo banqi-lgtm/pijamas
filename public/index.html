@@ -1,1052 +1,1286 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="light">
+<html lang="es" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KITTY PIJAMAS - Sistema de Gestión de Pijamas Hello Kitty</title>
-  <meta name="description" content="Sistema ERP para la gestión de catálogo de pijamas, inventario (Kardex), facturación POS, clientes y reportes de KITTY PIJAMAS.">
-  <link rel="icon" type="image/png" href="logo.png">
-  <!-- Google Fonts: Inter -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- DataTables CSS -->
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
-  <!-- App Style -->
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-  <!-- 1. LOGIN SCREEN -->
-  <div id="login-screen" class="login-wrapper">
-    <div id="login-floating-kitties" class="floating-kitties-container"></div>
-    <div class="card erp-card" style="width: 420px; max-width: 90%; z-index: 1;">
-      <div class="text-center mb-4">
-        <div class="d-flex flex-column align-items-center mb-2">
-          <img src="logo.png" alt="Logo" class="rounded-circle mb-2" style="width: 80px; height: 80px; object-fit: cover; border: 2.5px solid var(--primary-color);">
-          <div class="h3 fw-bold text-primary">KITTY PIJAMAS ERP</div>
-        </div>
-        <p class="text-muted">Inicia sesión en la plataforma administrativa</p>
-      </div>
-      <div class="alert alert-danger d-none" id="login-alert"></div>
-      <form id="login-form">
-        <div class="mb-3">
-          <label class="form-label fw-semibold">Usuario</label>
-          <input type="text" id="login-username" class="form-control" placeholder="admin / empleado" required>
-        </div>
-        <div class="mb-3">
-          <label class="form-label fw-semibold">Contraseña</label>
-          <input type="password" id="login-password" class="form-control" placeholder="••••••••" required>
-        </div>
-        <div class="d-flex justify-content-between mb-4 align-items-center">
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="remember-me">
-            <label class="form-check-label text-muted" for="remember-me">Recordarme</label>
-          </div>
-          <a href="#" class="text-decoration-none" onclick="forgotPassword()">¿Olvidó contraseña?</a>
-        </div>
-        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">Ingresar al ERP</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- 2. MAIN ERP CONTAINER -->
-  <div id="erp-container" class="app-container d-none">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="sidebar-logo">
-        <img src="logo.png" alt="Logo" class="me-2 rounded-circle" style="width: 32px; height: 32px; object-fit: cover; border: 1.5px solid var(--primary-color);">
-        <span>KITTY PIJAMAS</span>
-      </div>
-      <ul class="sidebar-menu">
-        <li class="sidebar-item active" data-target="dashboard">
-          <a href="#"><i class="fa-solid fa-chart-pie"></i>Dashboard</a>
-        </li>
-        <li class="sidebar-item" data-target="products">
-          <a href="#"><i class="fa-solid fa-tags"></i>Productos</a>
-        </li>
-        <li class="sidebar-item" data-target="inventory">
-          <a href="#"><i class="fa-solid fa-boxes-stacked"></i>Inventario (Kardex)</a>
-        </li>
-        <li class="sidebar-item" data-target="sales">
-          <a href="#"><i class="fa-solid fa-cart-shopping"></i>Ventas (POS)</a>
-        </li>
-        <li class="sidebar-item" data-target="purchases">
-          <a href="#"><i class="fa-solid fa-truck-ramp-box"></i>Compras</a>
-        </li>
-        <li class="sidebar-item" data-target="clients">
-          <a href="#"><i class="fa-solid fa-users"></i>Clientes</a>
-        </li>
-        <li class="sidebar-item" data-target="providers">
-          <a href="#"><i class="fa-solid fa-truck"></i>Proveedores</a>
-        </li>
-        <li class="sidebar-item" data-target="reports">
-          <a href="#"><i class="fa-solid fa-chart-line"></i>Reportes</a>
-        </li>
-        <li class="sidebar-item" data-target="users">
-          <a href="#"><i class="fa-solid fa-user-shield"></i>Seguridad (Logs)</a>
-        </li>
-        <li class="sidebar-item" data-target="settings">
-          <a href="#"><i class="fa-solid fa-gears"></i>Configuración</a>
-        </li>
-      </ul>
-    </aside>
-
-    <!-- Main Content Area -->
-    <div class="main-wrapper">
-      <header>
-        <div>
-          <h4 class="fw-bold m-0" id="module-title">Dashboard Principal</h4>
-          <span class="text-muted small" style="font-size:0.8rem;">Hola, ¡Bienvenido de nuevo al ERP de KITTY PIJAMAS!</span>
-        </div>
-        <div class="d-flex align-items-center gap-3">
-          <div class="input-group d-none d-md-flex" style="width: 220px;">
-            <span class="input-group-text bg-white border-end-0" style="border-radius: 0.75rem 0 0 0.75rem; border-color: var(--border-color);"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
-            <input type="text" class="form-control border-start-0" placeholder="Buscar en ERP..." style="border-radius: 0 0.75rem 0.75rem 0; border-color: var(--border-color); font-size: 0.85rem;" onkeyup="globalERPSearch(this.value)">
-          </div>
-          <button class="btn btn-outline-secondary btn-sm" id="theme-toggle" onclick="toggleTheme()">
-            <i class="fa-solid fa-moon"></i> Modo Oscuro
-          </button>
-          <span class="badge bg-primary" id="user-display-role">ADMIN</span>
-          <button class="btn btn-sm btn-outline-danger" onclick="logout()" title="Cerrar Sesión">
-            <i class="fa-solid fa-right-from-bracket me-1"></i> Salir
-          </button>
-        </div>
-      </header>
-
-      <main class="content-body">
-        
-        <!-- DASHBOARD MODULE -->
-        <div id="module-dashboard" class="module-panel active">
-          <!-- Stats Grid -->
-          <div class="row">
-            <div class="col-xl-3 col-md-6 mb-2">
-              <div class="erp-card stat-card h-100 mb-0">
-                <div class="w-100">
-                  <div class="text-muted fs-7">Total Productos</div>
-                  <div class="stat-value text-indigo" id="stat-total-products">0</div>
-                  <div class="d-flex align-items-center gap-1 mt-2">
-                    <span class="badge bg-success-light text-success p-1" style="font-size: 0.72rem; font-weight: 700;"><i class="fa-solid fa-arrow-up"></i> 3.2%</span>
-                    <span class="text-muted small" style="font-size: 0.72rem;">este mes</span>
-                  </div>
-                </div>
-                <div class="stat-icon bg-primary bg-opacity-10 text-primary"><i class="fa-solid fa-tags"></i></div>
-              </div>
-            </div>
-            <div class="col-xl-3 col-md-6 mb-2">
-              <div class="erp-card stat-card h-100 mb-0">
-                <div class="w-100">
-                  <div class="text-muted fs-7">Stock Bajo</div>
-                  <div class="stat-value text-warning" id="stat-low-stock">0</div>
-                  <div class="d-flex align-items-center gap-1 mt-2">
-                    <span class="badge bg-warning-light text-warning p-1" style="font-size: 0.72rem; font-weight: 700;"><i class="fa-solid fa-arrow-down"></i> 12%</span>
-                    <span class="text-muted small" style="font-size: 0.72rem;">vs ayer</span>
-                  </div>
-                </div>
-                <div class="stat-icon bg-warning bg-opacity-10 text-warning"><i class="fa-solid fa-triangle-exclamation"></i></div>
-              </div>
-            </div>
-            <div class="col-xl-3 col-md-6 mb-2">
-              <div class="erp-card stat-card h-100 mb-0">
-                <div class="w-100">
-                  <div class="text-muted fs-7">Productos Agotados</div>
-                  <div class="stat-value text-danger" id="stat-out-of-stock">0</div>
-                  <div class="d-flex align-items-center gap-1 mt-2">
-                    <span class="badge bg-danger-light text-danger p-1" style="font-size: 0.72rem; font-weight: 700;"><i class="fa-solid fa-arrow-up"></i> +1 nuevo</span>
-                    <span class="text-muted small" style="font-size: 0.72rem;">hoy</span>
-                  </div>
-                </div>
-                <div class="stat-icon bg-danger bg-opacity-10 text-danger"><i class="fa-solid fa-circle-xmark"></i></div>
-              </div>
-            </div>
-            <div class="col-xl-3 col-md-6 mb-2">
-              <div class="erp-card stat-card h-100 mb-0">
-                <div class="w-100">
-                  <div class="text-muted fs-7">Valor Inventario</div>
-                  <div class="stat-value text-success" id="stat-inventory-val">$0</div>
-                  <div class="d-flex align-items-center gap-1 mt-2">
-                    <span class="badge bg-success-light text-success p-1" style="font-size: 0.72rem; font-weight: 700;"><i class="fa-solid fa-arrow-up"></i> 5.4%</span>
-                    <span class="text-muted small" style="font-size: 0.72rem;">valorización</span>
-                  </div>
-                </div>
-                <div class="stat-icon bg-success bg-opacity-10 text-success"><i class="fa-solid fa-dollar-sign"></i></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Charts & Main Area -->
-          <div class="row align-items-stretch">
-            <div class="col-md-8">
-              <div class="erp-card h-100 mb-0 d-flex flex-column justify-content-between">
-                <div>
-                  <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-line me-2"></i>Historial de Ventas</h5>
-                    <div class="d-flex gap-2">
-                      <select class="form-select form-select-sm" style="width: 140px; font-size: 0.8rem; border-color: var(--border-color);">
-                        <option value="30">Últimos 30 días</option>
-                        <option value="7">Últimos 7 días</option>
-                        <option value="12">Este año</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div style="position: relative; height: 160px; width: 100%;">
-                    <canvas id="salesChart"></canvas>
-                  </div>
-                </div>
-                <!-- 3 Mini-Métricas Resumen -->
-                <div class="row mt-2 pt-2 border-top g-2">
-                  <div class="col-4 border-end text-center">
-                    <span class="text-muted small" style="font-size: 0.72rem;">Ventas Totales</span>
-                    <h6 class="fw-bold mt-0 mb-0 text-primary" id="summary-total-sales" style="font-size: 0.95rem;">$0</h6>
-                  </div>
-                  <div class="col-4 border-end text-center">
-                    <span class="text-muted small" style="font-size: 0.72rem;">Ticket Promedio</span>
-                    <h6 class="fw-bold mt-0 mb-0 text-primary" id="summary-average-ticket" style="font-size: 0.95rem;">$0</h6>
-                  </div>
-                  <div class="col-4 text-center">
-                    <span class="text-muted small" style="font-size: 0.72rem;">Transacciones</span>
-                    <h6 class="fw-bold mt-0 mb-0 text-primary" id="summary-total-transactions" style="font-size: 0.95rem;">0</h6>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="col-md-4">
-              <div class="erp-card h-100 mb-0 d-flex flex-column justify-content-between p-3">
-                <h5 class="fw-bold mb-3"><i class="fa-solid fa-bolt text-primary me-2"></i>Accesos Rápidos</h5>
-                <div class="row g-2 flex-grow-1 align-content-stretch">
-                  <div class="col-6">
-                    <div class="erp-card text-center p-2 h-100 mb-0 btn-quick-access d-flex flex-column justify-content-center align-items-center" onclick="loadModule('sales')" style="cursor: pointer; border-radius: 12px; min-height: 80px;">
-                      <div class="stat-icon bg-primary bg-opacity-10 text-primary mb-1" style="width: 34px; height: 34px; font-size: 1rem;"><i class="fa-solid fa-cart-shopping"></i></div>
-                      <h6 class="fw-bold mb-0" style="font-size: 0.78rem;">Nueva Venta</h6>
-                      <p class="text-muted small mb-0" style="font-size: 0.65rem; line-height: 1.1;">Generar POS</p>
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <div class="erp-card text-center p-2 h-100 mb-0 btn-quick-access d-flex flex-column justify-content-center align-items-center" onclick="openAddProductModal()" style="cursor: pointer; border-radius: 12px; min-height: 80px;">
-                      <div class="stat-icon bg-primary bg-opacity-10 text-primary mb-1" style="width: 34px; height: 34px; font-size: 1rem;"><i class="fa-solid fa-plus"></i></div>
-                      <h6 class="fw-bold mb-0" style="font-size: 0.78rem;">Crear Pijama</h6>
-                      <p class="text-muted small mb-0" style="font-size: 0.65rem; line-height: 1.1;">Nuevo Item</p>
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <div class="erp-card text-center p-2 h-100 mb-0 btn-quick-access d-flex flex-column justify-content-center align-items-center" onclick="openInventoryMoveModal()" style="cursor: pointer; border-radius: 12px; min-height: 80px;">
-                      <div class="stat-icon bg-primary bg-opacity-10 text-primary mb-1" style="width: 34px; height: 34px; font-size: 1rem;"><i class="fa-solid fa-right-left"></i></div>
-                      <h6 class="fw-bold mb-0" style="font-size: 0.78rem;">Kardex</h6>
-                      <p class="text-muted small mb-0" style="font-size: 0.65rem; line-height: 1.1;">Mover Stock</p>
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <div class="erp-card text-center p-2 h-100 mb-0 btn-quick-access d-flex flex-column justify-content-center align-items-center" onclick="loadModule('reports')" style="cursor: pointer; border-radius: 12px; min-height: 80px;">
-                      <div class="stat-icon bg-primary bg-opacity-10 text-primary mb-1" style="width: 34px; height: 34px; font-size: 1rem;"><i class="fa-solid fa-chart-line"></i></div>
-                      <h6 class="fw-bold mb-0" style="font-size: 0.78rem;">Reportes</h6>
-                      <p class="text-muted small mb-0" style="font-size: 0.65rem; line-height: 1.1;">Exportar PDF</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- PRODUCTS MODULE (Split layout: Catálogo + Inventario) -->
-        <div id="module-products" class="module-panel">
-          <div class="row g-3 align-items-stretch">
-            
-            <!-- Left Panel: Catálogo de Pijamas -->
-            <div class="col-12 mb-3">
-              <div class="erp-card mb-0 d-flex flex-column">
-                <!-- Header -->
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <h5 class="fw-bold mb-0 d-flex align-items-center" style="font-size: 1.05rem;">
-                    <button class="btn btn-sm btn-link text-primary p-0 me-2" onclick="toggleCollapse('catalog-card-body', this)" style="box-shadow: none;"><i class="fa-solid fa-chevron-down"></i></button>
-                    <i class="fa-solid fa-shirt me-2 text-primary"></i>Catálogo de Pijamas
-                  </h5>
-                  <div class="d-flex gap-1">
-                    <button class="btn btn-sm btn-outline-primary" onclick="openCategoriesModal()"><i class="fa-solid fa-list"></i> Categorías</button>
-                    <button class="btn btn-sm btn-outline-success" onclick="openExcelImport()"><i class="fa-solid fa-file-excel"></i> Importar</button>
-                    <button class="btn btn-sm btn-primary" onclick="openAddProductModal()"><i class="fa-solid fa-plus"></i> + Pijama</button>
-                  </div>
-                </div>
-                
-                <div id="catalog-card-body" style="display: none;">
-                  <!-- Filters -->
-                  <div class="p-2 mb-3 bg-light" style="border-radius: 8px; border: 1px solid var(--border-color);">
-                    <div class="row g-1">
-                      <div class="col-4">
-                        <select class="form-select form-select-sm" id="filter-category" onchange="applyProductFilters()">
-                          <option value="">Categoría: Todos</option>
-                        </select>
-                      </div>
-                      <div class="col-3">
-                        <select class="form-select form-select-sm" id="filter-size" onchange="applyProductFilters()">
-                          <option value="">Talla: Todos</option>
-                          <option value="XS">XS</option>
-                          <option value="S">S</option>
-                          <option value="M">M</option>
-                          <option value="L">L</option>
-                          <option value="XL">XL</option>
-                          <option value="XXL">XXL</option>
-                          <option value="8">Talla 8</option>
-                          <option value="10">Talla 10</option>
-                          <option value="12M">12M</option>
-                        </select>
-                      </div>
-                      <div class="col-5">
-                        <input type="text" class="form-control form-control-sm" id="search-product-input" placeholder="Buscar..." onkeyup="applyProductFilters()">
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <!-- Table -->
-                  <div class="table-responsive flex-grow-1">
-                    <table id="products-table" class="table table-hover table-sm w-100 align-middle" style="font-size: 0.85rem;">
-                      <thead>
-                        <tr>
-                          <th>Código</th>
-                          <th>Nombre</th>
-                          <th>Categoría</th>
-                          <th>Talla</th>
-                          <th>Color</th>
-                          <th>P. Venta</th>
-                          <th>Existencias</th>
-                          <th>Estado</th>
-                          <th>Acciones</th>
-                        </tr>
-                      </thead>
-                      <tbody id="products-table-body"></tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Right Panel: Movimientos de Inventario (Kardex) -->
-            <div class="col-12">
-              <div class="erp-card mb-0 d-flex flex-column">
-                <!-- Header -->
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <h5 class="fw-bold mb-0 d-flex align-items-center" style="font-size: 1.05rem;">
-                    <button class="btn btn-sm btn-link text-primary p-0 me-2" onclick="toggleCollapse('kardex-card-body', this)" style="box-shadow: none;"><i class="fa-solid fa-chevron-down"></i></button>
-                    <i class="fa-solid fa-boxes-stacked me-2 text-primary"></i>Kardex (Inventario)
-                  </h5>
-                  <button class="btn btn-sm btn-primary" onclick="openInventoryMoveModal()"><i class="fa-solid fa-right-left"></i> + Movimiento</button>
-                </div>
-                
-                <div id="kardex-card-body" style="display: none;">
-                  <!-- Table -->
-                  <div class="table-responsive flex-grow-1">
-                    <table id="kardex-table" class="table table-hover table-sm w-100 align-middle" style="font-size: 0.82rem;">
-                      <thead>
-                        <tr>
-                          <th>Fecha</th>
-                          <th>Código</th>
-                          <th>Producto</th>
-                          <th>Tipo</th>
-                          <th>Cantidad</th>
-                          <th>Motivo / Referencia</th>
-                          <th>Usuario</th>
-                        </tr>
-                      </thead>
-                      <tbody id="kardex-table-body"></tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </div>
-        </div>
-
-        <!-- SALES (POS) MODULE -->
-        <div id="module-sales" class="module-panel">
-          <div class="pos-container">
-            <!-- Left Side: POS Cart / Product selection -->
-            <div class="erp-card">
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="fw-bold mb-0"><i class="fa-solid fa-cash-register me-2"></i>Punto de Venta (POS)</h5>
-                <button class="btn btn-outline-primary btn-sm" onclick="triggerBarcodeScanSimulation()"><i class="fa-solid fa-barcode me-2"></i>Escanear Código de Barras (Simulado)</button>
-              </div>
-              <div class="mb-3">
-                <label class="form-label fw-semibold">Buscar Pijama</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
-                  <input type="text" class="form-control" id="pos-product-search" placeholder="Escriba código o nombre de la pijama para agregar..." oninput="searchPosProducts(this.value)">
-                </div>
-                <div class="list-group dropdown-menu w-100 shadow" id="pos-search-results" style="display:none; max-height:250px; overflow-y:auto;">
-                  <!-- Results dynamically appended -->
-                </div>
-              </div>
-              <div class="table-responsive" style="max-height: 400px;">
-                <table class="table">
-                  <thead>
-                    <tr>
-                      <th>Pijama</th>
-                      <th>Talla/Color</th>
-                      <th>Precio Unit.</th>
-                      <th style="width: 120px;">Cant.</th>
-                      <th>Total</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody id="pos-cart-body">
-                    <!-- Items -->
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <!-- Right Side: Totals / Customer selection -->
-            <div class="erp-card">
-              <h5 class="fw-bold mb-3"><i class="fa-solid fa-receipt me-2"></i>Facturación y Pago</h5>
-              <div class="mb-3">
-                <label class="form-label fw-semibold">Cliente</label>
-                <select class="form-select" id="pos-client-select">
-                  <!-- Filled dynamically -->
-                </select>
-              </div>
-              <div class="mb-3">
-                <label class="form-label fw-semibold">Método de Pago</label>
-                <select class="form-select" id="pos-payment-method">
-                  <option value="Efectivo">Efectivo</option>
-                  <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
-                  <option value="Transferencia">Transferencia Bancaria</option>
-                </select>
-              </div>
-              <div class="mb-3">
-                <label class="form-label fw-semibold">Descuento ($)</label>
-                <input type="number" class="form-control" id="pos-discount" value="0" min="0" oninput="recalculatePosTotals()">
-              </div>
-              <hr>
-              <div class="d-flex justify-content-between mb-2">
-                <span>Subtotal:</span>
-                <span id="pos-subtotal">$0</span>
-              </div>
-              <div class="d-flex justify-content-between mb-2">
-                <span>IVA Incluido (19%):</span>
-                <span id="pos-tax">$0</span>
-              </div>
-              <div class="d-flex justify-content-between mb-2 text-danger">
-                <span>Descuento:</span>
-                <span id="pos-discount-val">-$0</span>
-              </div>
-              <div class="d-flex justify-content-between mb-3 fw-bold fs-5 text-primary">
-                <span>Total a Pagar:</span>
-                <span id="pos-total">$0</span>
-              </div>
-              <button class="btn btn-success w-100 py-3 fw-bold" onclick="processPOSSale()"><i class="fa-solid fa-file-invoice-dollar me-2"></i>GENERAR FACTURA</button>
-            </div>
-          </div>
-
-          <!-- Sales History Card below POS -->
-          <div class="erp-card mt-3">
-            <h5 class="fw-bold mb-3"><i class="fa-solid fa-clock-rotate-left me-2"></i>Historial de Facturas Emitidas</h5>
-            <div class="table-responsive">
-              <table id="sales-history-table" class="table table-hover w-100">
-                <thead>
-                  <tr>
-                    <th>Factura No.</th>
-                    <th>Fecha</th>
-                    <th>Cliente</th>
-                    <th>Método Pago</th>
-                    <th>Total</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody id="sales-history-body"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- PURCHASES MODULE -->
-        <div id="module-purchases" class="module-panel">
-          <div class="d-flex justify-content-between mb-3 align-items-center">
-            <h5 class="fw-bold mb-0"><i class="fa-solid fa-truck-ramp-box me-2"></i>Órdenes de Compra y Reabastecimiento</h5>
-            <button class="btn btn-primary" onclick="openNewPurchaseModal()"><i class="fa-solid fa-plus me-2"></i>Registrar Compra</button>
-          </div>
-          <div class="erp-card">
-            <div class="table-responsive">
-              <table id="purchases-table" class="table table-hover w-100">
-                <thead>
-                  <tr>
-                    <th>Orden No.</th>
-                    <th>Fecha</th>
-                    <th>Proveedor</th>
-                    <th>Total</th>
-                    <th>Estado</th>
-                  </tr>
-                </thead>
-                <tbody id="purchases-body"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- CLIENTS MODULE -->
-        <div id="module-clients" class="module-panel">
-          <div class="d-flex justify-content-between mb-3 align-items-center">
-            <h5 class="fw-bold mb-0"><i class="fa-solid fa-users me-2"></i>Gestión de Clientes</h5>
-            <button class="btn btn-primary" onclick="openAddClientModal()"><i class="fa-solid fa-plus me-2"></i>Agregar Cliente</button>
-          </div>
-          <div class="erp-card">
-            <div class="table-responsive">
-              <table id="clients-table" class="table table-hover w-100">
-                <thead>
-                  <tr>
-                    <th>Nombre</th>
-                    <th>Email</th>
-                    <th>Teléfono</th>
-                    <th>Dirección</th>
-                    <th>Saldo Pendiente</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody id="clients-body"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- PROVIDERS MODULE -->
-        <div id="module-providers" class="module-panel">
-          <div class="d-flex justify-content-between mb-3 align-items-center">
-            <h5 class="fw-bold mb-0"><i class="fa-solid fa-truck me-2"></i>Gestión de Proveedores</h5>
-            <button class="btn btn-primary" onclick="openAddProviderModal()"><i class="fa-solid fa-plus me-2"></i>Agregar Proveedor</button>
-          </div>
-          <div class="erp-card">
-            <div class="table-responsive">
-              <table id="providers-table" class="table table-hover w-100">
-                <thead>
-                  <tr>
-                    <th>Empresa</th>
-                    <th>Contacto</th>
-                    <th>Teléfono</th>
-                    <th>Email</th>
-                    <th>Dirección</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody id="providers-body"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- REPORTS MODULE -->
-        <div id="module-reports" class="module-panel">
-          <h5 class="fw-bold mb-3"><i class="fa-solid fa-chart-line me-2"></i>Informes del Sistema</h5>
-          <div class="row">
-            <!-- Valuation -->
-            <div class="col-md-6 col-lg-4">
-              <div class="erp-card text-center p-4">
-                <i class="fa-solid fa-dollar-sign text-success fs-2 mb-3"></i>
-                <h6 class="fw-bold">Reporte de Inventario</h6>
-                <p class="text-muted small">Costo total de stock actual, cantidades de existencias y valor comercial.</p>
-                <button class="btn btn-primary btn-sm" onclick="exportReport('inventory', 'csv')"><i class="fa-solid fa-file-csv me-2"></i>Exportar CSV</button>
-              </div>
-            </div>
-            <!-- Sales -->
-            <div class="col-md-6 col-lg-4">
-              <div class="erp-card text-center p-4">
-                <i class="fa-solid fa-basket-shopping text-primary fs-2 mb-3"></i>
-                <h6 class="fw-bold">Reporte de Ventas</h6>
-                <p class="text-muted small">Historial de ventas agrupadas, desglose de impuestos y utilidades.</p>
-                <button class="btn btn-primary btn-sm" onclick="exportReport('sales', 'csv')"><i class="fa-solid fa-file-csv me-2"></i>Exportar CSV</button>
-              </div>
-            </div>
-            <!-- Audit -->
-            <div class="col-md-6 col-lg-4">
-              <div class="erp-card text-center p-4">
-                <i class="fa-solid fa-chart-bar text-warning fs-2 mb-3"></i>
-                <h6 class="fw-bold">Movimientos de Inventario</h6>
-                <p class="text-muted small">Exportación del Kardex de transacciones de entradas y salidas.</p>
-                <button class="btn btn-primary btn-sm" onclick="exportReport('kardex', 'csv')"><i class="fa-solid fa-file-csv me-2"></i>Exportar CSV</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- USERS & AUDIT MODULE -->
-        <div id="module-users" class="module-panel">
-          <h5 class="fw-bold mb-3"><i class="fa-solid fa-user-shield me-2"></i>Seguridad y Auditoría del Sistema</h5>
-          <div class="erp-card">
-            <h6 class="fw-bold mb-3">Registro de Actividad (Logs)</h6>
-            <div class="table-responsive">
-              <table id="audit-logs-table" class="table table-hover table-sm">
-                <thead>
-                  <tr>
-                    <th>Fecha y Hora</th>
-                    <th>Usuario</th>
-                    <th>Acción</th>
-                    <th>Detalles</th>
-                  </tr>
-                </thead>
-                <tbody id="audit-logs-body"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- CONFIGURATION MODULE -->
-        <div id="module-settings" class="module-panel">
-          <h5 class="fw-bold mb-3"><i class="fa-solid fa-gears me-2"></i>Configuración de la Empresa</h5>
-          <div class="row">
-            <div class="col-md-8">
-              <div class="erp-card">
-                <form id="settings-form">
-                  <div class="row">
-                    <div class="col-md-6 mb-3">
-                      <label class="form-label fw-semibold">Nombre de la Tienda</label>
-                      <input type="text" class="form-control" name="company_name">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                      <label class="form-label fw-semibold">NIT / RUT</label>
-                      <input type="text" class="form-control" name="company_nit">
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-6 mb-3">
-                      <label class="form-label fw-semibold">Teléfono</label>
-                      <input type="text" class="form-control" name="company_phone">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                      <label class="form-label fw-semibold">Correo de Contacto</label>
-                      <input type="email" class="form-control" name="company_email">
-                    </div>
-                  </div>
-                  <div class="mb-3">
-                    <label class="form-label fw-semibold">Dirección</label>
-                    <input type="text" class="form-control" name="company_address">
-                  </div>
-                  <div class="row">
-                    <div class="col-md-4 mb-3">
-                      <label class="form-label fw-semibold">Moneda</label>
-                      <input type="text" class="form-control" name="currency">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                      <label class="form-label fw-semibold">Impuesto (%)</label>
-                      <input type="number" class="form-control" name="tax_rate">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                      <label class="form-label fw-semibold">Prefijo Facturas</label>
-                      <input type="text" class="form-control" name="invoice_prefix">
-                    </div>
-                  </div>
-                  <button type="submit" class="btn btn-primary fw-semibold"><i class="fa-solid fa-floppy-disk me-2"></i>Guardar Ajustes</button>
-                </form>
-              </div>
-            </div>
-            
-            <div class="col-md-4">
-              <div class="erp-card">
-                <h6 class="fw-bold mb-3"><i class="fa-solid fa-database me-2"></i>Copias de Seguridad</h6>
-                <p class="text-muted small">Cree respaldos de la base de datos o restaure la información del sistema a partir de una versión anterior.</p>
-                <div class="d-grid gap-2">
-                  <button class="btn btn-outline-primary" onclick="executeBackup()"><i class="fa-solid fa-download me-2"></i>Generar Backup</button>
-                  <button class="btn btn-outline-danger" onclick="executeRestore()"><i class="fa-solid fa-rotate-left me-2"></i>Restaurar Sistema</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </main>
-    </div>
-  </div>
-
-  <!-- TOAST NOTIFICATIONS CONTAINER -->
-  <div class="toast-container-fixed" id="toast-container"></div>
-
-  <!-- 3. MODALS -->
-
-  <!-- PRODUCT MODAL (Create/Edit) -->
-  <div class="modal fade" id="product-modal" tabindex="-1" style="backdrop-filter: blur(5px);">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-      <div class="modal-content border-0" style="border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.15);">
-        <form id="product-form">
-          <input type="hidden" id="product-id">
-          <!-- Header del modal con degradado rosa/fucsia -->
-          <div class="modal-header d-flex align-items-center justify-content-between p-4 border-0" style="background: linear-gradient(135deg, #e91e63, #c2185b); color: white;">
-            <div class="d-flex align-items-center gap-3">
-              <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 46px; height: 46px; font-size: 1.4rem; flex-shrink: 0;">
-                <i class="fa-solid fa-shirt"></i>
-              </div>
-              <div>
-                <h5 class="modal-title fw-bold m-0" id="product-modal-title" style="font-size: 1.2rem; letter-spacing: -0.5px;">Registrar Nueva Pijama</h5>
-                <span style="font-size: 0.75rem; opacity: 0.85;">Completa la información del producto</span>
-              </div>
-            </div>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" style="margin: 0;"></button>
-          </div>
-          <div class="modal-body p-4">
-            <!-- Row 1: Codigo, Codigo de barras, Categoria -->
-            <div class="row">
-              <div class="col-md-4 mb-3">
-                <label class="form-label fw-semibold">Código <span class="text-danger">*</span></label>
-                <div class="input-group">
-                  <input type="text" id="prod-code" class="form-control" placeholder="Ej: PJA-0001" required>
-                  <button class="btn btn-outline-primary fw-semibold px-2" type="button" onclick="generateRandomProductCode()" style="border-color: #fce4ec;"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
-                </div>
-              </div>
-              <div class="col-md-4 mb-3">
-                <label class="form-label fw-semibold">Código de Barras</label>
-                <div class="input-group">
-                  <span class="input-group-text bg-white border-end-0" style="border-color: var(--border-color);"><i class="fa-solid fa-barcode text-muted"></i></span>
-                  <input type="text" id="prod-barcode" class="form-control border-start-0" placeholder="Escanea o ingresa el código">
-                </div>
-              </div>
-              <div class="col-md-4 mb-3">
-                <label class="form-label fw-semibold">Categoría <span class="text-danger">*</span></label>
-                <select id="prod-category" class="form-select" required></select>
-              </div>
-            </div>
-
-            <!-- Row 2: Nombre del Producto, Marca -->
-            <div class="row">
-              <div class="col-md-8 mb-3">
-                <label class="form-label fw-semibold">Nombre del Producto <span class="text-danger">*</span></label>
-                <input type="text" id="prod-name" class="form-control" placeholder="Ej: Pijama Satin Elegance Dama" required>
-              </div>
-              <div class="col-md-4 mb-3">
-                <label class="form-label fw-semibold">Marca</label>
-                <input type="text" id="prod-brand" class="form-control" placeholder="Ej: KITTY PIJAMAS">
-              </div>
-            </div>
-
-            <!-- Row 3: Talla, Color, Material, Ubicacion -->
-            <div class="row">
-              <div class="col-md-3 mb-3">
-                <label class="form-label fw-semibold">Talla <span class="text-danger">*</span></label>
-                <select id="prod-size" class="form-select" required>
-                  <option value="XS">XS</option>
-                  <option value="S">S</option>
-                  <option value="M">M</option>
-                  <option value="L">L</option>
-                  <option value="XL">XL</option>
-                  <option value="XXL">XXL</option>
-                  <option value="8">Talla 8</option>
-                  <option value="10">Talla 10</option>
-                  <option value="12M">12M</option>
-                </select>
-              </div>
-              <div class="col-md-3 mb-3">
-                <label class="form-label fw-semibold">Color</label>
-                <div class="input-group">
-                  <span class="input-group-text bg-white border-end-0" style="border-color: var(--border-color);"><i class="fa-solid fa-circle text-primary" style="font-size: 0.8rem;"></i></span>
-                  <input type="text" id="prod-color" class="form-control border-start-0" placeholder="Ej: Rosado">
-                </div>
-              </div>
-              <div class="col-md-3 mb-3">
-                <label class="form-label fw-semibold">Material</label>
-                <div class="input-group">
-                  <span class="input-group-text bg-white border-end-0" style="border-color: var(--border-color);"><i class="fa-solid fa-scroll text-muted"></i></span>
-                  <input type="text" id="prod-material" class="form-control border-start-0" placeholder="Ej: Satín, Algodón">
-                </div>
-              </div>
-              <div class="col-md-3 mb-3">
-                <label class="form-label fw-semibold">Ubicación en Bodega</label>
-                <div class="input-group">
-                  <span class="input-group-text bg-white border-end-0" style="border-color: var(--border-color);"><i class="fa-solid fa-location-dot text-muted"></i></span>
-                  <input type="text" id="prod-location" class="form-control border-start-0" placeholder="Ej: Estantería B-3">
-                </div>
-              </div>
-            </div>
-
-            <!-- Row 4: Precio Compra, Precio Venta, Estado, Existencia, Stock Min -->
-            <div class="row">
-              <div class="col-md-3 mb-3">
-                <label class="form-label fw-semibold">Precio Compra <span class="text-danger">*</span></label>
-                <div class="input-group">
-                  <span class="input-group-text bg-white border-end-0" style="border-color: var(--border-color);"><i class="fa-solid fa-dollar-sign text-muted" style="font-size: 0.8rem;"></i></span>
-                  <input type="number" id="prod-purchase-price" class="form-control border-start-0" placeholder="0,00" min="0" required>
-                </div>
-              </div>
-              <div class="col-md-3 mb-3">
-                <label class="form-label fw-semibold">Precio Venta <span class="text-danger">*</span></label>
-                <div class="input-group">
-                  <span class="input-group-text bg-white border-end-0" style="border-color: var(--border-color);"><i class="fa-solid fa-tag text-muted" style="font-size: 0.8rem;"></i></span>
-                  <input type="number" id="prod-sale-price" class="form-control border-start-0" placeholder="0,00" min="0" required>
-                </div>
-              </div>
-              <div class="col-md-2 mb-3">
-                <label class="form-label fw-semibold">Estado <span class="text-danger">*</span></label>
-                <select id="prod-status" class="form-select px-1" required>
-                  <option value="Disponible">🟢 Disp.</option>
-                  <option value="Agotado">🔴 Agot.</option>
-                  <option value="Descontinuado">⚫ Desc.</option>
-                </select>
-              </div>
-              <div class="col-md-2 mb-3">
-                <label class="form-label fw-semibold">Exist. Inicial</label>
-                <input type="number" id="prod-stock" class="form-control" placeholder="0" min="0">
-              </div>
-              <div class="col-md-2 mb-3">
-                <label class="form-label fw-semibold">Stock Mín.</label>
-                <input type="number" id="prod-min-stock" class="form-control" placeholder="5" min="0" value="5">
-              </div>
-            </div>
-
-            <!-- Banner de nota informativa -->
-            <div class="d-flex align-items-center gap-2 p-2 mt-1" style="background-color: var(--bg-sidebar-hover); border-radius: 8px;">
-              <i class="fa-solid fa-circle-info text-primary fs-6"></i>
-              <span class="small text-muted" style="font-size: 0.75rem;"><strong>Importante:</strong> Los campos marcados con <span class="text-danger">*</span> son obligatorios.</span>
-            </div>
-          </div>
-          <div class="modal-footer border-0 p-4 pt-0">
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius: 8px;">Cancelar</button>
-            <button type="submit" class="btn btn-primary fw-semibold" style="border-radius: 8px;"><i class="fa-solid fa-floppy-disk me-1"></i> Guardar Pijama</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- INVENTORY TRANSACTION MODAL -->
-  <div class="modal fade" id="inventory-move-modal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-      <div class="modal-content border-0">
-        <form id="inventory-move-form">
-          <div class="modal-header bg-primary text-white">
-            <h5 class="modal-title fw-bold">Registrar Transacción de Inventario</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Producto</label>
-              <select id="inv-product-select" class="form-select" required></select>
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label class="form-label fw-semibold">Tipo de Movimiento</label>
-                <select id="inv-type" class="form-select" required>
-                  <option value="Entrada">Entrada (Abastecimiento)</option>
-                  <option value="Salida">Salida (Merma / Retiro)</option>
-                  <option value="Ajuste">Ajuste (Corrección)</option>
-                </select>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label fw-semibold">Cantidad</label>
-                <input type="number" id="inv-quantity" class="form-control" min="1" required>
-              </div>
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Motivo del Ajuste</label>
-              <textarea id="inv-reason" class="form-control" rows="2" placeholder="Describa el por qué del movimiento..." required></textarea>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-            <button type="submit" class="btn btn-primary">Registrar</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- EXCEL IMPORT MODAL -->
-  <div class="modal fade" id="excel-modal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-      <div class="modal-content border-0">
-        <div class="modal-header bg-success text-white">
-          <h5 class="modal-title fw-bold"><i class="fa-solid fa-file-excel me-2"></i>Carga Masiva desde Excel</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <p class="small text-muted">Seleccione un archivo de excel o CSV para cargar masivamente sus referencias de pijamas en la base de datos.</p>
-          
-          <div class="mb-4 excel-template-box">
-            <h6 class="fw-bold mb-2"><i class="fa-solid fa-download me-2"></i>¿No tienes la estructura?</h6>
-            <p class="small mb-3">Descarga nuestra plantilla estructurada lista para rellenar en Excel y subir aquí.</p>
-            <button type="button" class="btn btn-sm btn-success w-100" onclick="downloadCSVTemplate()">
-              <i class="fa-solid fa-file-excel me-2"></i>Descargar Plantilla Excel (.xlsx)
-            </button>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Seleccionar Archivo</label>
-            <input type="file" class="form-control" accept=".csv,.xlsx,.xls" id="excel-file-input">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn btn-success" onclick="simulateExcelImport()">Procesar Carga</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PURCHASE ORDER MODAL -->
-  <div class="modal fade" id="purchase-modal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-      <div class="modal-content border-0">
-        <form id="purchase-form">
-          <div class="modal-header bg-primary text-white">
-            <h5 class="modal-title fw-bold">Registrar Compra a Proveedor</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Proveedor</label>
-              <select id="purch-provider-select" class="form-select" required></select>
-            </div>
-            <h6 class="fw-bold mt-4 mb-3 border-bottom pb-2">Items a Solicitar</h6>
-            <div id="purch-items-list" class="mb-3">
-              <!-- Dynamically added rows -->
-            </div>
-            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addPurchaseItemRow()"><i class="fa-solid fa-plus me-1"></i>Añadir Item</button>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn btn-primary">Registrar Compra</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- CLIENT MODAL (Create/Edit) -->
-  <div class="modal fade" id="client-modal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-      <div class="modal-content border-0">
-        <form id="client-form">
-          <input type="hidden" id="client-id">
-          <div class="modal-header bg-primary text-white">
-            <h5 class="modal-title fw-bold" id="client-modal-title">Registrar Cliente</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Nombre Completo *</label>
-              <input type="text" id="client-name" class="form-control" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Email</label>
-              <input type="email" id="client-email" class="form-control">
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Teléfono</label>
-              <input type="text" id="client-phone" class="form-control">
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Dirección</label>
-              <input type="text" id="client-address" class="form-control">
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Saldo Pendiente ($)</label>
-              <input type="number" id="client-balance" class="form-control" value="0" min="0">
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn btn-primary">Guardar</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- PROVIDER MODAL (Create/Edit) -->
-  <div class="modal fade" id="provider-modal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-      <div class="modal-content border-0">
-        <form id="provider-form">
-          <input type="hidden" id="provider-id">
-          <div class="modal-header bg-primary text-white">
-            <h5 class="modal-title fw-bold" id="provider-modal-title">Registrar Proveedor</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Nombre / Razón Social *</label>
-              <input type="text" id="prov-name" class="form-control" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Nombre del Contacto</label>
-              <input type="text" id="prov-contact" class="form-control">
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Teléfono</label>
-              <input type="text" id="prov-phone" class="form-control">
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Email</label>
-              <input type="email" id="prov-email" class="form-control">
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Dirección</label>
-              <input type="text" id="prov-address" class="form-control">
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn btn-primary">Guardar</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- CATEGORIES MODAL (Manage categories) -->
-  <div class="modal fade" id="categories-modal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-      <div class="modal-content border-0">
-        <div class="modal-header bg-primary text-white">
-          <h5 class="modal-title fw-bold">Gestionar Categorías</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <form id="category-add-form" class="mb-4">
-            <label class="form-label fw-semibold">Nueva Categoría</label>
-            <div class="input-group">
-              <input type="text" id="new-category-name" class="form-control" placeholder="Ej: Babuchas, Cobijas" required>
-              <button class="btn btn-primary" type="submit">Agregar</button>
-            </div>
-          </form>
-          <h6 class="fw-bold border-bottom pb-2">Categorías Existentes</h6>
-          <div style="max-height: 250px; overflow-y: auto;">
-            <ul class="list-group" id="categories-list-group">
-              <!-- Dynamically loaded -->
-            </ul>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PRINT TICKET SIMULATION AREA -->
-  <div id="print-ticket-area" style="display:none;"></div>
-
-  <!-- JS Libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- SheetJS to generate structured Excel files -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <!-- Firebase SDK Compat -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics-compat.js"></script>
+  <title>ALFA ELECTRONIC COLOMBIA SAS | Reparación de Electrónica Industrial Multimarca</title>
+  <meta name="description" content="Líderes en diagnóstico, reparación y mantenimiento de equipos electrónicos industriales en Bogotá, Colombia. Variadores, PLCs, Servos, HMIs y Fuentes. Diagnóstico sin costo en 3 días y garantía de 6 meses.">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/logo_clean.png">
+  
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS via CDN with Alfa Official Red -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyC7BXrTD9ebqDvTTcn7uI-kBcG34cNfrmQ",
-      authDomain: "kittypijamas-20631.firebaseapp.com",
-      projectId: "kittypijamas-20631",
-      storageBucket: "kittypijamas-20631.firebasestorage.app",
-      messagingSenderId: "59242228883",
-      appId: "1:59242228883:web:59b1a5f6509cb539117166",
-      measurementId: "G-G5SHNYL0XE"
-    };
-    firebase.initializeApp(firebaseConfig);
-    firebase.analytics();
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            alfa: {
+              50: '#fff1f2',
+              100: '#ffe4e6',
+              200: '#fecdd3',
+              300: '#fda4af',
+              400: '#fb7185',
+              500: '#d91e25', // Rojo Oficial Alfa
+              600: '#c2161d',
+              700: '#a31016',
+              800: '#871116',
+              900: '#701418',
+              950: '#3e0608',
+            }
+          }
+        }
+      }
+    }
   </script>
-  <!-- App JS Logic -->
-  <script src="app.js"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Smooth clean scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #ffffff;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #e2e8f0;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #cbd5e1;
+    }
+    /* Subtle smooth card hover */
+    .service-card {
+      transition: all 0.25s ease-in-out;
+    }
+    .service-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 32px -8px rgba(15, 23, 42, 0.08);
+    }
+  </style>
+</head>
+<body class="bg-white text-slate-800 font-sans antialiased selection:bg-alfa-500 selection:text-white relative">
+
+  <!-- Anchor at the absolute top of the page so #inicio always scrolls to top 0 -->
+  <div id="inicio" class="absolute top-0 left-0 w-full h-0 pointer-events-none"></div>
+
+  <!-- ================= TOP ANNOUNCEMENT BAR ================= -->
+  <div class="bg-slate-900 text-white text-xs py-2.5 px-4">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-2">
+      <div class="flex items-center gap-3">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30 text-[11px]">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          Laboratorio Abierto en Bogotá
+        </span>
+        <span class="hidden sm:inline text-slate-400">|</span>
+        <span class="text-slate-300 text-xs">
+          Cra 24 # 82-87, Barrio Polo Club • Diagnóstico estándar <strong class="text-white">Gratuito (0 COP)</strong>
+        </span>
+      </div>
+      <div class="flex items-center gap-4 text-xs font-medium">
+        <a href="tel:+576014884737" class="hover:text-alfa-400 transition flex items-center gap-1.5 text-slate-200">
+          <i data-lucide="phone" class="w-3.5 h-3.5 text-alfa-500"></i>
+          (601) 488 4737
+        </a>
+        <span class="text-slate-600">|</span>
+        <a href="mailto:co@alfa-electronic.co" class="hover:text-alfa-400 transition flex items-center gap-1.5 text-slate-200">
+          <i data-lucide="mail" class="w-3.5 h-3.5 text-alfa-500"></i>
+          co@alfa-electronic.co
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MAIN HEADER & NAVBAR ================= -->
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm transition-all duration-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <!-- Brand Logo on Left (Un solo logo oficial) -->
+        <a href="#inicio" class="flex items-center gap-3 group">
+          <img src="assets/logo_clean.png" alt="ALFA ELECTRONIC" class="h-10 w-auto object-contain transition group-hover:scale-105">
+        </a>
+
+        
+        <!-- Navigation Links (Left & Center, Generously Spaced) -->
+        <nav class="hidden lg:flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-600">
+          <a href="#inicio" class="hover:text-alfa-500 hover:bg-slate-50 px-3.5 py-2 rounded-lg transition whitespace-nowrap">Inicio</a>
+          <a href="#servicios" class="hover:text-alfa-500 hover:bg-slate-50 px-3.5 py-2 rounded-lg transition whitespace-nowrap">Servicios</a>
+          <a href="equipos.html" class="hover:text-alfa-500 hover:bg-slate-50 px-3.5 py-2 rounded-lg transition whitespace-nowrap flex items-center gap-1.5 font-bold">
+            <i data-lucide="camera" class="w-3.5 h-3.5 text-alfa-500"></i>
+            <span>Equipos</span>
+          </a>
+          <a href="#componentes" class="hover:text-alfa-500 hover:bg-slate-50 px-3.5 py-2 rounded-lg transition whitespace-nowrap">Componentes</a>
+          <a href="#contacto" class="hover:text-alfa-500 hover:bg-slate-50 px-3.5 py-2 rounded-lg transition whitespace-nowrap">Contacto</a>
+        </nav>
+
+        <!-- CTA Action Buttons (Organized on Right) -->
+        <div class="flex items-center gap-3 ml-auto">
+          <a href="https://wa.me/573174351630?text=Hola%20ALFA%20Electronic,%20deseo%20solicitar%20un%20diagn%C3%B3stico%20gratuito" target="_blank"
+            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-alfa-500 hover:bg-alfa-600 text-white shadow-md shadow-alfa-500/20 transition transform hover:-translate-y-0.5 whitespace-nowrap">
+            <i data-lucide="clipboard-check" class="w-4 h-4 shrink-0"></i>
+            <span>Diagnóstico Gratis</span>
+          </a>
+          <a href="https://wa.me/573174351630?text=Hola%20ALFA%20Electronic,%20deseo%20m%C3%A1s%20informaci%C3%B3n" target="_blank"
+            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition whitespace-nowrap">
+            <i data-lucide="message-circle" class="w-4 h-4 text-emerald-600 shrink-0"></i>
+            <span>WhatsApp</span>
+          </a>
+
+          <!-- Mobile Menu Button -->
+          <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition ml-2">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div id="mobile-nav" class="hidden lg:hidden border-t border-slate-100 bg-white px-5 pt-3 pb-5 space-y-2 shadow-lg">
+      <a href="#inicio" class="block py-2 text-xs font-bold uppercase tracking-wider text-slate-700 hover:text-alfa-500 mobile-nav-link">Inicio</a>
+      <a href="#servicios" class="block py-2 text-xs font-bold uppercase tracking-wider text-slate-700 hover:text-alfa-500 mobile-nav-link">Servicios de Reparación</a>
+      <a href="equipos.html" class="block py-2 text-xs font-bold uppercase tracking-wider text-slate-700 hover:text-alfa-500 mobile-nav-link flex items-center justify-between">
+        <span>Galería de Equipos</span>
+        <span class="px-2 py-0.5 rounded-full bg-alfa-50 border border-alfa-200 text-alfa-600 text-[10px] font-bold">Fotos Reales</span>
+      </a>
+      <a href="#componentes" class="block py-2 text-xs font-bold uppercase tracking-wider text-slate-700 hover:text-alfa-500 mobile-nav-link">Venta de Componentes</a>
+      <a href="#contacto" class="block py-2 text-xs font-bold uppercase tracking-wider text-slate-700 hover:text-alfa-500 mobile-nav-link">Contacto & Ubicación</a>
+      <div class="pt-2">
+        <a href="https://wa.me/573174351630?text=Hola%20ALFA%20Electronic,%20deseo%20solicitar%20un%20diagn%C3%B3stico%20gratuito" target="_blank" 
+          class="block text-center py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-alfa-500 text-white shadow-md mobile-nav-link">
+          Solicitar Diagnóstico Sin Costo
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= HERO SECTION (CLEAN, COMPACT & BALANCED) ================= -->
+  <section id="hero" class="relative bg-slate-950 text-white border-b border-slate-800 overflow-hidden pt-4 pb-8 sm:pt-6 sm:pb-10 lg:pt-8 lg:pb-12 select-none">
+    
+    <!-- Custom Video Canvas Layer (Genera video en vivo 60 FPS con fotos reales de taller, osciloscopio, láser de escaneo y telemetría) -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
+      <canvas id="alfa-video-canvas" class="w-full h-full object-cover"></canvas>
+      
+      <!-- Overlays para contraste cinematográfico perfecto y legibilidad de texto -->
+      <div class="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/85 to-slate-950/75"></div>
+      <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/80"></div>
+      <div class="absolute inset-0 bg-blue-950/25 mix-blend-color"></div>
+      
+      <!-- Resplandor ambiental de alta tecnología -->
+      <div class="absolute -top-32 -left-32 w-96 h-96 bg-alfa-600/20 rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-blue-500/15 rounded-full blur-3xl"></div>
+    </div>
+
+    <!-- Content Layer -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        
+        <!-- Left Column: Title starts directly, Basic Info, Subtitles, CTA -->
+        <div class="lg:col-span-8 space-y-3.5 sm:space-y-4">
+          
+          <!-- Kinetic Typography Headline with Word Translation Animation -->
+          <div>
+            <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black text-white font-display tracking-tight leading-tight">
+              <span>Recuperamos y reparamos </span>
+              <span class="inline-block overflow-hidden align-bottom text-alfa-400 font-extrabold">
+                <span id="kinetic-slider" class="inline-block transition-all duration-500 ease-out transform translate-y-0 opacity-100">
+                  Variadores de Frecuencia
+                </span>
+              </span>
+            </h1>
+
+            <p class="mt-2 text-sm sm:text-base text-slate-300 max-w-2xl leading-relaxed font-normal">
+              Obtén tu diagnóstico en 3 días hábiles sin costo o elige nuestra opción exprés de 24 horas. Respaldamos cada reparación con 6 meses de garantía certificada. Reparamos y recuperamos variadores de frecuencia, servodrives, PLCs, pantallas táctiles y fuentes conmutadas de cualquier fabricante, entre muchas cosas más.
+            </p>
+          </div>
+
+          <!-- Live Subtitles Teleprompter (Sin voz, solo subtítulos en vivo) -->
+          <div class="max-w-2xl">
+            <div class="inline-flex items-center gap-3 px-4 py-3 rounded-2xl bg-slate-900/85 backdrop-blur-md border border-white/15 text-xs sm:text-sm text-slate-200 shadow-2xl">
+              <span class="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-xl bg-alfa-500/20 text-alfa-400 border border-alfa-500/30">
+                <i data-lucide="subtitles" class="w-4 h-4"></i>
+              </span>
+              <span id="live-subtitle" class="font-medium transition-opacity duration-300">
+                Diagnóstico sin costo en 3 días hábiles (o 24h exprés) con 6 meses de garantía certificada.
+              </span>
+            </div>
+          </div>
+
+          <!-- Hero Action Buttons -->
+          <div class="flex flex-wrap items-center gap-3 pt-2">
+            <a href="https://wa.me/573174351630?text=Hola%20ALFA%20Electronic,%20deseo%20solicitar%20un%20diagn%C3%B3stico%20de%20reparaci%C3%B3n" target="_blank"
+              class="px-5 py-3 rounded-xl bg-alfa-500 hover:bg-alfa-600 text-white text-xs sm:text-sm font-bold transition flex items-center gap-2 shadow-lg shadow-alfa-500/25 transform hover:-translate-y-0.5">
+              <i data-lucide="message-circle" class="w-4 h-4"></i>
+              <span>Solicitar Diagnóstico WhatsApp</span>
+            </a>
+
+            <a href="equipos.html"
+              class="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs sm:text-sm font-bold transition flex items-center gap-2 backdrop-blur-md transform hover:-translate-y-0.5">
+              <i data-lucide="camera" class="w-4 h-4 text-alfa-400"></i>
+              <span>Ver Galería de Equipos (Fotos Reales)</span>
+            </a>
+
+            <a href="#servicios"
+              class="px-4 py-3 rounded-xl text-slate-300 hover:text-white text-xs sm:text-sm font-semibold transition flex items-center gap-1.5">
+              <span>Servicios ↓</span>
+            </a>
+          </div>
+
+          <!-- Feature Pills -->
+          <div class="flex flex-wrap gap-2.5 pt-2 text-xs font-semibold text-slate-300">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900/70 backdrop-blur-md border border-white/10 text-slate-200">
+              <i data-lucide="shield-check" class="w-4 h-4 text-alfa-400"></i>
+              6 Meses de Garantía
+            </span>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900/70 backdrop-blur-md border border-white/10 text-slate-200">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+              Diagnóstico Sin Costo (0 COP)
+            </span>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900/70 backdrop-blur-md border border-white/10 text-slate-200">
+              <i data-lucide="activity" class="w-4 h-4 text-cyan-400"></i>
+              Banco de Pruebas Dinámico
+            </span>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900/70 backdrop-blur-md border border-white/10 text-slate-200">
+              <i data-lucide="truck" class="w-4 h-4 text-amber-400"></i>
+              Envíos a Nivel Nacional
+            </span>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Live Diagnostic Metrics Card -->
+        <div class="lg:col-span-4">
+          <div class="rounded-3xl bg-slate-900/80 backdrop-blur-xl border border-white/15 p-6 sm:p-8 shadow-2xl space-y-5">
+            <div class="flex items-center justify-between pb-4 border-b border-white/10">
+              <div>
+                <span class="text-xs font-mono text-alfa-400 font-bold uppercase">ALFA SERVICIO INDUSTRIAL</span>
+                <h3 class="text-lg font-bold text-white">Centro de Reparación</h3>
+              </div>
+              <div class="w-10 h-10 rounded-2xl bg-alfa-500/20 border border-alfa-500/30 flex items-center justify-center text-alfa-400">
+                <i data-lucide="cpu" class="w-5 h-5"></i>
+              </div>
+            </div>
+
+            <div class="space-y-3.5 text-xs text-slate-300">
+              <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/60 border border-white/5">
+                <span class="text-slate-400 flex items-center gap-2">
+                  <i data-lucide="shield-check" class="w-4 h-4 text-alfa-400"></i>
+                  Garantía Certificada:
+                </span>
+                <span class="font-bold text-white font-mono">6 Meses</span>
+              </div>
+              <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/60 border border-white/5">
+                <span class="text-slate-400 flex items-center gap-2">
+                  <i data-lucide="zap" class="w-4 h-4 text-alfa-400"></i>
+                  Opción Exprés:
+                </span>
+                <span class="font-bold text-amber-400 font-mono">24 Horas</span>
+              </div>
+              <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/60 border border-white/5">
+                <span class="text-slate-400 flex items-center gap-2">
+                  <i data-lucide="activity" class="w-4 h-4 text-alfa-400"></i>
+                  Banco de Pruebas:
+                </span>
+                <span class="font-bold text-emerald-400 font-mono">Carga Dinámica Real</span>
+              </div>
+              <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/60 border border-white/5">
+                <span class="text-slate-400 flex items-center gap-2">
+                  <i data-lucide="layers" class="w-4 h-4 text-alfa-400"></i>
+                  Cobertura Técnica:
+                </span>
+                <span class="font-bold text-white font-mono">Cualquier Fabricante</span>
+              </div>
+            </div>
+
+            <!-- Real-time HUD Indicator -->
+            <div class="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-slate-400">
+              <span class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>OSCILOSCOPIO ACTIVO</span>
+              </span>
+              <span class="text-cyan-400 font-bold">60.0 Hz • VFD RUN</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= LOGO / VALUE STRIP ================= -->
+  <section class="py-6 sm:py-8 bg-slate-50/70 border-b border-slate-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        
+        <div class="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-sm">
+          <div class="text-3xl font-extrabold font-display text-slate-900 counter-value" data-target="10000" data-prefix="+" data-suffix="">+10,000</div>
+          <div class="text-sm font-semibold text-slate-700 mt-1">Equipos Recuperados</div>
+          <div class="text-xs text-slate-500">Para la industria nacional</div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-sm">
+          <div class="text-3xl font-extrabold font-display text-alfa-500 counter-value" data-target="1400" data-prefix="+" data-suffix="">+1,400</div>
+          <div class="text-sm font-semibold text-slate-700 mt-1">Marcas Reparadas</div>
+          <div class="text-xs text-slate-500">Siemens, Danfoss, ABB, Allen-B...</div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-sm">
+          <div class="text-3xl font-extrabold font-display text-slate-900 counter-value" data-target="800" data-prefix="+" data-suffix="">+800</div>
+          <div class="text-sm font-semibold text-slate-700 mt-1">Clientes Corporativos</div>
+          <div class="text-xs text-slate-500">Plantas de producción activas</div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-sm">
+          <div class="text-3xl font-extrabold font-display text-alfa-500 counter-value" data-target="6" data-prefix="" data-suffix=" Meses">6 Meses</div>
+          <div class="text-sm font-semibold text-slate-700 mt-1">Garantía Certificada</div>
+          <div class="text-xs text-slate-500">Respaldo total en laboratorio</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ================= SERVICIOS DE REPARACIÓN ================= -->
+  <section id="servicios" class="scroll-mt-20 pt-8 pb-12 sm:pt-10 sm:pb-14 bg-white border-b border-slate-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto space-y-2.5 mb-8 sm:mb-10">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-alfa-50 border border-alfa-200 text-xs font-bold text-alfa-600">
+          <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+          SERVICIOS DE LABORATORIO
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold font-display text-slate-900">
+          Especialistas en Electrónica de Gama Industrial
+        </h2>
+        <p class="text-slate-600 text-sm sm:text-base">
+          Mantenimiento correctivo y preventivo de componentes de alta potencia y control para mantener sus líneas de producción activas.
+        </p>
+      </div>
+
+      <!-- Grid of Services -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        
+        <!-- Service 1: Variadores -->
+        <div class="service-card bg-white rounded-3xl border border-slate-200 p-8 shadow-sm flex flex-col justify-between group">
+          <div>
+            <div class="w-12 h-12 rounded-2xl bg-alfa-50 text-alfa-500 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
+              <i data-lucide="zap" class="w-6 h-6"></i>
+            </div>
+            <span class="inline-block px-2.5 py-0.5 rounded text-[11px] font-bold text-slate-500 bg-slate-100 mb-2">0.5 A 500+ HP</span>
+            <h3 class="text-xl font-bold font-display text-slate-900 mb-2.5">
+              Variadores de Frecuencia (VFD) y Arrancadores
+            </h3>
+            <p class="text-slate-600 text-sm leading-relaxed mb-6">
+              Mantenimiento correctivo y preventivo de variadores AC y DC, servoinversores y arrancadores suaves multimarca.
+            </p>
+          </div>
+          <button onclick="openQuoteWith('Variadores de Frecuencia')" class="w-full py-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-100 group-hover:bg-alfa-500 group-hover:text-white text-slate-700 transition flex items-center justify-center gap-2">
+            <span>Cotizar Reparación</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Service 2: Servodrives -->
+        <div class="service-card bg-white rounded-3xl border border-slate-200 p-8 shadow-sm flex flex-col justify-between group">
+          <div>
+            <div class="w-12 h-12 rounded-2xl bg-alfa-50 text-alfa-500 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
+              <i data-lucide="cpu" class="w-6 h-6"></i>
+            </div>
+            <span class="inline-block px-2.5 py-0.5 rounded text-[11px] font-bold text-slate-500 bg-slate-100 mb-2">CINEMÁTICA CNC</span>
+            <h3 class="text-xl font-bold font-display text-slate-900 mb-2.5">
+              Servodrives, Servomotores & Robótica
+            </h3>
+            <p class="text-slate-600 text-sm leading-relaxed mb-6">
+              Sistemas de control cinemático de alta precisión para robots industriales, centros de mecanizado CNC y empaque.
+            </p>
+          </div>
+          <button onclick="openQuoteWith('Servodrives y Servomotores')" class="w-full py-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-100 group-hover:bg-alfa-500 group-hover:text-white text-slate-700 transition flex items-center justify-center gap-2">
+            <span>Cotizar Reparación</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Service 3: PLCs -->
+        <div class="service-card bg-white rounded-3xl border border-slate-200 p-8 shadow-sm flex flex-col justify-between group">
+          <div>
+            <div class="w-12 h-12 rounded-2xl bg-alfa-50 text-alfa-500 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
+              <i data-lucide="layers" class="w-6 h-6"></i>
+            </div>
+            <span class="inline-block px-2.5 py-0.5 rounded text-[11px] font-bold text-slate-500 bg-slate-100 mb-2">AUTOMATIZACIÓN</span>
+            <h3 class="text-xl font-bold font-display text-slate-900 mb-2.5">
+              PLCs, CPUs y Módulos de E/S
+            </h3>
+            <p class="text-slate-600 text-sm leading-relaxed mb-6">
+              Controladores lógicos programables compactos y modulares, fuentes internas y tarjetas de comunicación de campo.
+            </p>
+          </div>
+          <button onclick="openQuoteWith('PLCs y Controladores')" class="w-full py-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-100 group-hover:bg-alfa-500 group-hover:text-white text-slate-700 transition flex items-center justify-center gap-2">
+            <span>Cotizar Reparación</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Service 4: HMIs -->
+        <div class="service-card bg-white rounded-3xl border border-slate-200 p-8 shadow-sm flex flex-col justify-between group">
+          <div>
+            <div class="w-12 h-12 rounded-2xl bg-alfa-50 text-alfa-500 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
+              <i data-lucide="monitor" class="w-6 h-6"></i>
+            </div>
+            <span class="inline-block px-2.5 py-0.5 rounded text-[11px] font-bold text-slate-500 bg-slate-100 mb-2">INTERFAZ DE OPERADOR</span>
+            <h3 class="text-xl font-bold font-display text-slate-900 mb-2.5">
+              Pantallas Táctiles & HMIs Industriales
+            </h3>
+            <p class="text-slate-600 text-sm leading-relaxed mb-6">
+              Sustitución de paneles táctiles rotos, digitalizadores, pantallas LCD y fuentes internas de terminales de operador.
+            </p>
+          </div>
+          <button onclick="openQuoteWith('Pantallas HMI')" class="w-full py-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-100 group-hover:bg-alfa-500 group-hover:text-white text-slate-700 transition flex items-center justify-center gap-2">
+            <span>Cotizar Reparación</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Service 5: Fuentes -->
+        <div class="service-card bg-white rounded-3xl border border-slate-200 p-8 shadow-sm flex flex-col justify-between group">
+          <div>
+            <div class="w-12 h-12 rounded-2xl bg-alfa-50 text-alfa-500 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
+              <i data-lucide="battery-charging" class="w-6 h-6"></i>
+            </div>
+            <span class="inline-block px-2.5 py-0.5 rounded text-[11px] font-bold text-slate-500 bg-slate-100 mb-2">POTENCIA RIEL DIN</span>
+            <h3 class="text-xl font-bold font-display text-slate-900 mb-2.5">
+              Fuentes Conmutadas y UPS Industriales
+            </h3>
+            <p class="text-slate-600 text-sm leading-relaxed mb-6">
+              Fuentes de riel DIN y chasis trifásicas de alta corriente para tableros de control y automatización.
+            </p>
+          </div>
+          <button onclick="openQuoteWith('Fuentes de Poder')" class="w-full py-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-100 group-hover:bg-alfa-500 group-hover:text-white text-slate-700 transition flex items-center justify-center gap-2">
+            <span>Cotizar Reparación</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Service 6: Tarjetas Especiales -->
+        <div class="service-card bg-white rounded-3xl border border-slate-200 p-8 shadow-sm flex flex-col justify-between group">
+          <div>
+            <div class="w-12 h-12 rounded-2xl bg-alfa-50 text-alfa-500 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
+              <i data-lucide="circuit-board" class="w-6 h-6"></i>
+            </div>
+            <span class="inline-block px-2.5 py-0.5 rounded text-[11px] font-bold text-slate-500 bg-slate-100 mb-2">SIN ESQUEMAS</span>
+            <h3 class="text-xl font-bold font-display text-slate-900 mb-2.5">
+              Tarjetas Multicapa & Maquinaria Especial
+            </h3>
+            <p class="text-slate-600 text-sm leading-relaxed mb-6">
+              Recuperación de placas electrónicas propietarias o descontinuadas de maquinaria europea, asiática y americana.
+            </p>
+          </div>
+          <button onclick="openQuoteWith('Tarjetas Electrónicas')" class="w-full py-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-100 group-hover:bg-alfa-500 group-hover:text-white text-slate-700 transition flex items-center justify-center gap-2">
+            <span>Cotizar Reparación</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= VENTA DE COMPONENTES INDUSTRIALES ================= -->
+  <section id="componentes" class="scroll-mt-20 py-10 sm:py-12 bg-white border-b border-slate-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 sm:mb-8">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-alfa-50 border border-alfa-200 text-xs font-bold text-alfa-600 mb-2">
+            <i data-lucide="box" class="w-3.5 h-3.5"></i>
+            SUMINISTRO DE COMPONENTES
+          </div>
+          <h2 class="text-3xl font-extrabold font-display text-slate-900">
+            Catálogo de Componentes Industriales
+          </h2>
+          <p class="text-slate-600 text-sm mt-1">
+            Venta y despacho nacional de semiconductores difíciles de conseguir desde nuestro centro en Bogotá.
+          </p>
+        </div>
+        <span class="text-xs text-slate-400 font-medium">Despachos diarios a nivel nacional</span>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 text-xs">
+        
+        <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:border-alfa-500 transition shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="font-bold text-slate-900 text-sm">Circuitos Integrados</div>
+            <div class="text-xs text-slate-500 mt-1">Drivers, MCUs, Optoacopladores</div>
+          </div>
+          <button onclick="openStockModal('Circuitos Integrados (Drivers, MCUs, Optoacopladores)')" class="mt-4 text-xs font-bold text-alfa-600 hover:text-alfa-700 hover:underline flex items-center gap-1 transition">
+            <span>Consultar stock</span> &rarr;
+          </button>
+        </div>
+
+        <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:border-alfa-500 transition shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="font-bold text-slate-900 text-sm">Módulos IGBT / Potencia</div>
+            <div class="text-xs text-slate-500 mt-1">Semikron, Fuji, Eupec, Infineon</div>
+          </div>
+          <button onclick="openStockModal('Módulos IGBT / Potencia (Semikron, Fuji, Eupec, Infineon)')" class="mt-4 text-xs font-bold text-alfa-600 hover:text-alfa-700 hover:underline flex items-center gap-1 transition">
+            <span>Consultar stock</span> &rarr;
+          </button>
+        </div>
+
+        <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:border-alfa-500 transition shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="font-bold text-slate-900 text-sm">Condensadores 105°C</div>
+            <div class="text-xs text-slate-500 mt-1">Electrolíticos de alta tensión</div>
+          </div>
+          <button onclick="openStockModal('Condensadores 105°C (Electrolíticos de alta tensión)')" class="mt-4 text-xs font-bold text-alfa-600 hover:text-alfa-700 hover:underline flex items-center gap-1 transition">
+            <span>Consultar stock</span> &rarr;
+          </button>
+        </div>
+
+        <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:border-alfa-500 transition shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="font-bold text-slate-900 text-sm">Fusibles Ultrarrápidos</div>
+            <div class="text-xs text-slate-500 mt-1">Bussmann, Ferraz Shawmut</div>
+          </div>
+          <button onclick="openStockModal('Fusibles Ultrarrápidos (Bussmann, Ferraz Shawmut)')" class="mt-4 text-xs font-bold text-alfa-600 hover:text-alfa-700 hover:underline flex items-center gap-1 transition">
+            <span>Consultar stock</span> &rarr;
+          </button>
+        </div>
+
+        <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:border-alfa-500 transition shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="font-bold text-slate-900 text-sm">Touch & Pantallas LCD</div>
+            <div class="text-xs text-slate-500 mt-1">Para terminales HMI industriales</div>
+          </div>
+          <button onclick="openStockModal('Touch & Pantallas LCD (Terminales HMI)')" class="mt-4 text-xs font-bold text-alfa-600 hover:text-alfa-700 hover:underline flex items-center gap-1 transition">
+            <span>Consultar stock</span> &rarr;
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= CONTACTO Y MAPA DE BOGOTÁ ================= -->
+  <section id="contacto" class="scroll-mt-20 py-10 sm:py-14 bg-slate-50 border-b border-slate-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        
+        <div class="lg:col-span-5 space-y-5">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-200 text-xs font-bold text-slate-700 shadow-sm">
+            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-alfa-500"></i>
+            CENTRO DE REPARACIONES BOGOTÁ
+          </div>
+          <h2 class="text-3xl sm:text-4xl font-extrabold font-display text-slate-900">
+            ALFA ELECTRONIC COLOMBIA SAS
+          </h2>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            Nuestro laboratorio y centro especializado de recepción se encuentra ubicado en el sector de Polo Club en Bogotá. Recibimos equipos personalmente o a través de empresas de transporte nacional.
+          </p>
+
+          <div class="space-y-3.5 pt-2 text-xs">
+            <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
+              <span class="text-slate-400 block text-[11px] font-semibold uppercase tracking-wider">Dirección Física:</span>
+              <strong class="text-slate-900 text-sm block mt-0.5">Carrera 24 # 82-87, Barrio Polo Club</strong>
+              <div class="text-slate-500 text-xs">Bogotá D.C. - Colombia</div>
+            </div>
+
+            <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
+              <span class="text-slate-400 block text-[11px] font-semibold uppercase tracking-wider">Línea Directa PBX:</span>
+              <a href="tel:+576014884737" class="text-alfa-600 font-bold text-sm block mt-0.5 hover:underline">
+                (601) 488 4737
+              </a>
+            </div>
+
+            <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
+              <span class="text-slate-400 block text-[11px] font-semibold uppercase tracking-wider">Correo Electrónico:</span>
+              <a href="mailto:co@alfa-electronic.co" class="text-slate-900 font-bold text-sm block mt-0.5 hover:underline">
+                co@alfa-electronic.co
+              </a>
+            </div>
+
+            <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
+              <span class="text-slate-400 block text-[11px] font-semibold uppercase tracking-wider">Horario de Atención:</span>
+              <span class="text-slate-900 font-bold text-sm block mt-0.5">Lunes a Viernes: 8:00 AM – 5:30 PM</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Google Map Embed Frame -->
+        <div class="lg:col-span-7">
+          <div class="bg-white rounded-3xl border border-slate-200 p-3 shadow-xl">
+            <div class="p-3 bg-slate-50 rounded-2xl flex items-center justify-between text-xs mb-2">
+              <span class="text-slate-700 font-bold">Ubicación: Cra 24 # 82-87, Polo Club, Bogotá</span>
+              <a href="https://maps.google.com/?q=Cra+24+%23+82-87,+Bogot%C3%A1" target="_blank" class="text-alfa-600 hover:underline font-bold">
+                Ver en Google Maps &rarr;
+              </a>
+            </div>
+            <iframe 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.6025902167664!2d-74.06646872394627!3d4.664741341981156!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f9a567634f1bf%3A0x6b4412ec7ad6f6c0!2sCra.%2024%20%23%2082-87%2C%20Bogot%C3%A1!5e0!3m2!1ses!2sco!4v1716490000000!5m2!1ses!2sco" 
+              class="w-full rounded-2xl border border-slate-100" 
+              style="border:0; height: 380px;" 
+              allowfullscreen="" 
+              loading="lazy" 
+              referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="bg-slate-950 text-slate-400 text-xs py-10 sm:py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6 border-b border-slate-800 pb-8">
+        <div class="flex items-center gap-4">
+          <div class="bg-white p-2 rounded-xl h-14 flex items-center">
+            <img src="assets/logo_clean.png" alt="ALFA ELECTRONIC" class="h-full w-auto object-contain">
+          </div>
+          <div>
+            <div class="text-white font-bold text-sm">ALFA ELECTRONIC COLOMBIA SAS</div>
+            <div class="text-slate-400 text-xs">NIT: 900721717-0 • Cra 24 # 82-87, Bogotá, Colombia</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-6 text-xs font-semibold">
+          <a href="tel:+576014884737" class="hover:text-white transition">PBX: (601) 488 4737</a>
+          <a href="mailto:co@alfa-electronic.co" class="hover:text-white transition">co@alfa-electronic.co</a>
+          <a href="https://www.youtube.com/@ALFAElectronicColombia" target="_blank" class="text-alfa-400 hover:text-white transition font-bold">YouTube Oficial</a>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 text-slate-500 text-[11px]">
+        <div>&copy; 2026 ALFA ELECTRONIC COLOMBIA SAS. Todos los derechos reservados.</div>
+        <div>Diagnóstico Gratis en 3 Días • 6 Meses de Garantía • Multimarca Sin Esquemas</div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ================= FLOATING WIDGET: UN SOLO BOTÓN VERDE "SOLICITAR DIAGNÓSTICO" ================= -->
+  <div id="diag-floating-container" class="fixed bottom-6 right-6 z-40 flex flex-col items-end">
+    
+    <!-- Popover desplegable con las 2 opciones: Por Correo y Por WhatsApp -->
+    <div id="diag-popover" class="hidden mb-3 w-72 sm:w-80 bg-white rounded-3xl shadow-2xl border border-slate-200 p-4 transition-all duration-200">
+      <div class="flex items-center justify-between pb-2.5 mb-2.5 border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-800">Solicitar Diagnóstico</span>
+        </div>
+        <button type="button" onclick="toggleDiagPopover(false)" class="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition" title="Cerrar opciones">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <p class="text-xs text-slate-500 mb-3 leading-relaxed">
+        Selecciona cómo deseas solicitar tu diagnóstico técnico sin costo:
+      </p>
+
+      <div class="space-y-2.5">
+        <!-- Opción 1: Por Correo (Cuadro de Diálogo) -->
+        <button type="button" onclick="openDiagModal(); toggleDiagPopover(false);"
+          class="w-full flex items-center gap-3 p-3 rounded-2xl bg-slate-50 hover:bg-alfa-50 border border-slate-200 hover:border-alfa-300 text-left transition group cursor-pointer">
+          <div class="w-10 h-10 rounded-xl bg-alfa-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-alfa-500/20 group-hover:scale-105 transition-transform">
+            <i data-lucide="mail" class="w-5 h-5"></i>
+          </div>
+          <div class="flex-grow">
+            <div class="text-xs font-bold text-slate-900 group-hover:text-alfa-600 transition">Por Correo</div>
+            <div class="text-[11px] text-slate-500">Abrir cuadro de diálogo formal</div>
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform"></i>
+        </button>
+
+        <!-- Opción 2: Por WhatsApp -->
+        <a href="https://wa.me/573174351630?text=Hola%20ALFA%20Electronic,%20deseo%20solicitar%20un%20diagn%C3%B3stico%20de%20reparaci%C3%B3n" target="_blank"
+          onclick="toggleDiagPopover(false);"
+          class="w-full flex items-center gap-3 p-3 rounded-2xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-left transition group">
+          <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-600/20 group-hover:scale-105 transition-transform">
+            <i data-lucide="message-circle" class="w-5 h-5"></i>
+          </div>
+          <div class="flex-grow">
+            <div class="text-xs font-bold text-slate-900 group-hover:text-emerald-700 transition">Por WhatsApp</div>
+            <div class="text-[11px] text-slate-500">Chat y respuesta inmediata</div>
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Un solo botón verde flotante -->
+    <button type="button" id="diag-trigger-btn" onclick="toggleDiagPopover()"
+      class="flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white shadow-2xl hover:scale-105 transition-all text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-emerald-600/30 cursor-pointer select-none"
+      title="Solicitar Diagnóstico">
+      <i data-lucide="message-circle" class="w-5 h-5"></i>
+      <span>SOLICITAR DIAGNÓSTICO</span>
+      <i id="diag-trigger-icon" data-lucide="chevron-up" class="w-4 h-4 ml-0.5 transition-transform duration-200"></i>
+    </button>
+
+  </div>
+
+  <!-- ================= MODAL: CONSULTA DE STOCK & DIAGNÓSTICO ================= -->
+  <div id="stock-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity duration-200" onclick="handleStockModalBackdrop(event)">
+    <div class="relative bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full p-6 sm:p-8 overflow-hidden transform transition-all" onclick="event.stopPropagation()">
+      
+      <!-- Close Button -->
+      <button onclick="closeStockModal()" type="button" class="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition" title="Cerrar ventana">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Header -->
+      <div class="mb-6 pr-8">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-alfa-50 border border-alfa-200 text-xs font-bold text-alfa-600 mb-2">
+          <i data-lucide="box" class="w-3.5 h-3.5"></i>
+          <span id="stock-modal-badge">CONSULTA DE STOCK Y DISPONIBILIDAD</span>
+        </div>
+        <h3 id="stock-modal-title" class="text-xl sm:text-2xl font-black font-display text-slate-900">
+          Consultar Stock de Componente
+        </h3>
+        <p id="stock-modal-desc" class="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+          Ingresa tus datos y la referencia que necesitas. Te enviaremos disponibilidad, tiempo de entrega y cotización formal a tu correo.
+        </p>
+      </div>
+
+      <!-- Formulario de Consulta -->
+      <form id="stock-form" onsubmit="submitStockForm(event)" class="space-y-4">
+        
+        <!-- Nombre -->
+        <div>
+          <label for="stock-nombre" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+            Nombre Completo <span class="text-alfa-500">*</span>
+          </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+              <i data-lucide="user" class="w-4 h-4"></i>
+            </span>
+            <input type="text" id="stock-nombre" required placeholder="Ej: Carlos Gómez / Inversiones ABC"
+              class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-alfa-500 focus:border-transparent transition bg-slate-50/50 focus:bg-white" />
+          </div>
+        </div>
+
+        <!-- Correo Electrónico -->
+        <div>
+          <label for="stock-correo" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+            Correo Electrónico <span class="text-alfa-500">*</span>
+          </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+              <i data-lucide="mail" class="w-4 h-4"></i>
+            </span>
+            <input type="email" id="stock-correo" required placeholder="correo@empresa.com"
+              class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-alfa-500 focus:border-transparent transition bg-slate-50/50 focus:bg-white" />
+          </div>
+        </div>
+
+        <!-- Referencia del Componente y Cantidad -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="sm:col-span-2">
+            <label for="stock-referencia" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+              Referencia del Componente <span class="text-alfa-500">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+                <i data-lucide="tag" class="w-4 h-4"></i>
+              </span>
+              <input type="text" id="stock-referencia" required placeholder="Ej: SKM100GB128D / 6ES7..."
+                class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-alfa-500 focus:border-transparent transition bg-slate-50/50 focus:bg-white" />
+            </div>
+          </div>
+
+          <div>
+            <label for="stock-cantidad" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+              Cantidad <span class="text-alfa-500">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+                <i data-lucide="layers" class="w-4 h-4"></i>
+              </span>
+              <input type="number" id="stock-cantidad" min="1" value="1" required
+                class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-alfa-500 focus:border-transparent transition bg-slate-50/50 focus:bg-white text-center font-bold" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Teléfono / WhatsApp Opcional -->
+        <div>
+          <label for="stock-telefono" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5 flex items-center justify-between">
+            <span>Teléfono / WhatsApp</span>
+            <span class="text-slate-400 text-[10px] font-normal lowercase">(opcional)</span>
+          </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+              <i data-lucide="phone" class="w-4 h-4"></i>
+            </span>
+            <input type="tel" id="stock-telefono" placeholder="Ej: 310 123 4567"
+              class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-alfa-500 focus:border-transparent transition bg-slate-50/50 focus:bg-white" />
+          </div>
+        </div>
+
+        <!-- Botón Enviar Correo y Alternativa WhatsApp -->
+        <div class="pt-2 space-y-2.5">
+          <button type="submit" id="stock-submit-btn"
+            class="w-full py-3.5 px-6 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider bg-alfa-500 hover:bg-alfa-600 text-white shadow-lg shadow-alfa-500/25 transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+            <i data-lucide="send" class="w-4 h-4"></i>
+            <span>Enviar Correo</span>
+          </button>
+
+          <a href="https://wa.me/573174351630?text=Hola%20ALFA%20Electronic,%20deseo%20solicitar%20un%20diagn%C3%B3stico%20de%20reparaci%C3%B3n" target="_blank"
+            class="w-full py-2.5 px-4 rounded-xl text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition flex items-center justify-center gap-2">
+            <i data-lucide="message-circle" class="w-4 h-4 text-emerald-600"></i>
+            <span>O contactar directamente por WhatsApp</span>
+          </a>
+        </div>
+      </form>
+
+      <!-- Mensaje de Confirmación Exitosa -->
+      <div id="stock-success" class="hidden text-center py-6 space-y-4">
+        <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center">
+          <i data-lucide="check-circle-2" class="w-8 h-8"></i>
+        </div>
+        <div class="space-y-2">
+          <h4 class="text-xl font-extrabold text-slate-900 font-display">¡Solicitud de Stock Enviada!</h4>
+          <p id="stock-success-msg" class="text-xs sm:text-sm text-slate-600 max-w-sm mx-auto leading-relaxed">
+            Hemos recibido tu consulta con éxito. En breve enviaremos la cotización formal a tu correo.
+          </p>
+        </div>
+        <div class="pt-2">
+          <button type="button" onclick="closeStockModal()"
+            class="px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold uppercase tracking-wider transition">
+            Cerrar
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="app.js?v=4"></script>
+
+  <!-- Stock Modal Control Logic (Direct Execution) -->
+  <script>
+    window.openDiagModal = function() {
+      const badge = document.getElementById('stock-modal-badge');
+      const title = document.getElementById('stock-modal-title');
+      const desc = document.getElementById('stock-modal-desc');
+      const refInput = document.getElementById('stock-referencia');
+
+      if (badge) badge.textContent = 'SOLICITUD DE DIAGNÓSTICO TÉCNICO';
+      if (title) title.textContent = 'Solicitar Diagnóstico de Reparación';
+      if (desc) desc.textContent = 'Ingresa tus datos y la descripción o modelo de tu equipo. Te enviaremos el procedimiento de recepción y cotización a tu correo.';
+
+      window.openStockModal('Equipo Industrial para Diagnóstico');
+      if (refInput) {
+        refInput.placeholder = 'Ej: Variador Danfoss FC-302 / Servodrive Siemens / Tarjeta...';
+      }
+    };
+
+    window.openStockModal = function(defaultRef) {
+      const modal = document.getElementById('stock-modal');
+      const form = document.getElementById('stock-form');
+      const successBox = document.getElementById('stock-success');
+      const refInput = document.getElementById('stock-referencia');
+      const badge = document.getElementById('stock-modal-badge');
+      const title = document.getElementById('stock-modal-title');
+      const desc = document.getElementById('stock-modal-desc');
+
+      if (!modal) {
+        console.error('No se encontró el elemento #stock-modal');
+        return;
+      }
+
+      if (form) form.classList.remove('hidden');
+      if (successBox) successBox.classList.add('hidden');
+      if (form) form.reset();
+
+      if (defaultRef && !defaultRef.includes('Diagnóstico')) {
+        if (badge) badge.textContent = 'CONSULTA DE STOCK Y DISPONIBILIDAD';
+        if (title) title.textContent = 'Consultar Stock de Componente';
+        if (desc) desc.textContent = 'Ingresa tus datos y la referencia que necesitas. Te enviaremos disponibilidad, tiempo de entrega y cotización formal a tu correo.';
+        if (refInput) refInput.placeholder = 'Ej: SKM100GB128D / 6ES7...';
+      }
+
+      if (refInput && defaultRef) {
+        refInput.value = defaultRef;
+      }
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+      if (window.lucide) window.lucide.createIcons();
+
+      setTimeout(() => {
+        const nameInput = document.getElementById('stock-nombre');
+        if (nameInput) nameInput.focus();
+      }, 100);
+    };
+
+    window.closeStockModal = function() {
+      const modal = document.getElementById('stock-modal');
+      if (!modal) return;
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      document.body.style.overflow = '';
+    };
+
+    window.handleStockModalBackdrop = function(event) {
+      if (event.target && event.target.id === 'stock-modal') {
+        window.closeStockModal();
+      }
+    };
+
+    window.submitStockForm = async function(event) {
+      event.preventDefault();
+      const form = document.getElementById('stock-form');
+      const submitBtn = document.getElementById('stock-submit-btn');
+      const successBox = document.getElementById('stock-success');
+      const successMsg = document.getElementById('stock-success-msg');
+
+      const nombre = document.getElementById('stock-nombre')?.value.trim();
+      const correo = document.getElementById('stock-correo')?.value.trim();
+      const referencia = document.getElementById('stock-referencia')?.value.trim();
+      const cantidad = document.getElementById('stock-cantidad')?.value.trim() || '1';
+      const telefono = document.getElementById('stock-telefono')?.value.trim() || '';
+
+      if (!nombre || !correo || !referencia) {
+        alert('Por favor completa todos los campos requeridos (*)');
+        return;
+      }
+
+      const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="inline-block mr-2 animate-spin">⏳</span><span>Enviando correo...</span>';
+      }
+
+      try {
+        const payload = {
+          nombre,
+          correo,
+          referencia,
+          cantidad: parseInt(cantidad, 10) || 1,
+          telefono,
+          fecha: new Date().toISOString()
+        };
+
+        const res = await fetch('/api/consultar-stock', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        console.log('Respuesta del servidor stock:', data);
+
+        if (form) form.classList.add('hidden');
+        if (successBox) successBox.classList.remove('hidden');
+        if (successMsg) {
+          successMsg.textContent = `Hemos registrado tu solicitud para "${referencia}" (Cantidad: ${cantidad}). Te enviaremos la cotización a ${correo}.`;
+        }
+        if (window.lucide) window.lucide.createIcons();
+      } catch (err) {
+        console.warn('Registro local de solicitud de stock:', err);
+        if (form) form.classList.add('hidden');
+        if (successBox) successBox.classList.remove('hidden');
+        if (successMsg) {
+          successMsg.textContent = `Hemos registrado tu solicitud para "${referencia}". Te contactaremos en ${correo}.`;
+        }
+        if (window.lucide) window.lucide.createIcons();
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalBtnHtml;
+        }
+      }
+    };
+
+    window.toggleDiagPopover = function(forceState) {
+      const popover = document.getElementById('diag-popover');
+      const icon = document.getElementById('diag-trigger-icon');
+      if (!popover) return;
+
+      const isHidden = popover.classList.contains('hidden');
+      const shouldShow = typeof forceState === 'boolean' ? forceState : isHidden;
+
+      if (shouldShow) {
+        popover.classList.remove('hidden');
+        if (icon) icon.style.transform = 'rotate(180deg)';
+        if (window.lucide) window.lucide.createIcons();
+      } else {
+        popover.classList.add('hidden');
+        if (icon) icon.style.transform = 'rotate(0deg)';
+      }
+    };
+
+    document.addEventListener('click', (e) => {
+      const container = document.getElementById('diag-floating-container');
+      if (container && !container.contains(e.target)) {
+        window.toggleDiagPopover(false);
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        window.closeStockModal();
+        window.toggleDiagPopover(false);
+      }
+    });
+  </script>
+
+  <!-- ALFA Video Engine, Kinetic Typography & Live Subtitles (100% PROPIO) -->
+  <script>
+    (function() {
+      // ================= 1. KINETIC TYPOGRAPHY WORD TRANSLATION =================
+      const KINETIC_WORDS = [
+        "Variadores de Frecuencia",
+        "Servodrives Industriales",
+        "Controladores PLC",
+        "Pantallas Táctiles HMI",
+        "Fuentes Conmutadas",
+        "Tarjetas de Potencia",
+        "Arrancadores Suaves"
+      ];
+      let wordIdx = 0;
+      const sliderEl = document.getElementById('kinetic-slider');
+
+      function rotateKineticWord() {
+        if (!sliderEl) return;
+        sliderEl.style.transition = 'transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.45s ease';
+        sliderEl.style.transform = 'translateY(-120%)';
+        sliderEl.style.opacity = '0';
+
+        setTimeout(() => {
+          wordIdx = (wordIdx + 1) % KINETIC_WORDS.length;
+          sliderEl.textContent = KINETIC_WORDS[wordIdx];
+          sliderEl.style.transition = 'none';
+          sliderEl.style.transform = 'translateY(120%)';
+          
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              sliderEl.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease';
+              sliderEl.style.transform = 'translateY(0)';
+              sliderEl.style.opacity = '1';
+            });
+          });
+        }, 450);
+      }
+      setInterval(rotateKineticWord, 2800);
+
+      // ================= 2. LIVE SUBTITLES ROTATOR (SIN VOZ) =================
+      const SUBTITLES = [
+        "Diagnóstico sin costo en 3 días hábiles (o 24h exprés) con 6 meses de garantía certificada.",
+        "Recuperamos variadores, servodrives, PLCs y pantallas táctiles de cualquier fabricante.",
+        "Laboratorio especializado en Bogotá • Banco de pruebas con carga dinámica real sin esquemas previos.",
+        "Porque reparar también es innovar: mayor rentabilidad y máxima continuidad operativa para tu planta.",
+        "Evita costosos reemplazos completos y tiempos de parada prolongados con nuestro servicio técnico."
+      ];
+      let subIdx = 0;
+      const subEl = document.getElementById('live-subtitle');
+
+      function rotateSubtitle() {
+        if (!subEl) return;
+        subEl.style.opacity = '0';
+        setTimeout(() => {
+          subIdx = (subIdx + 1) % SUBTITLES.length;
+          subEl.textContent = SUBTITLES[subIdx];
+          subEl.style.opacity = '1';
+        }, 400);
+      }
+      setInterval(rotateSubtitle, 4500);
+
+      // ================= 3. 60 FPS CINEMATIC VIDEO ENGINE PROPIO (CANVAS) =================
+      const canvas = document.getElementById('alfa-video-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      const REAL_IMAGES_SRC = [
+        "f.galeria/WhatsApp%20Image%202026-09-05%20at%2018.13.36.jpeg",
+        "f.galeria/WhatsApp%20Image%202026-09-05%20at%2018.14.03.jpeg",
+        "f.galeria/WhatsApp%20Image%202026-09-05%20at%2018.14.26.jpeg",
+        "f.galeria/WhatsApp%20Image%202026-09-05%20at%2018.15.01.jpeg",
+        "f.galeria/WhatsApp%20Image%202026-09-05%20at%2018.15.49.jpeg",
+        "f.galeria/WhatsApp%20Image%202026-09-05%20at%2018.16.06.jpeg",
+        "f.galeria/WhatsApp%20Image%202026-09-05%20at%2018.17.14.jpeg",
+        "assets/lab-photo.jpg"
+      ];
+
+      const loadedImages = [];
+      REAL_IMAGES_SRC.forEach(src => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.src = src;
+        img.onload = () => loadedImages.push(img);
+      });
+
+      let currentImgIdx = 0;
+      let nextImgIdx = 1;
+      let progress = 0;
+      let time = 0;
+      let laserY = 0;
+
+      function resizeCanvas() {
+        if (!canvas.parentElement) return;
+        const rect = canvas.parentElement.getBoundingClientRect();
+        canvas.width = rect.width || window.innerWidth;
+        canvas.height = rect.height || 600;
+      }
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+
+      function drawCoverImage(img, scaleProgress, alpha = 1) {
+        if (!img || !img.complete || img.naturalWidth === 0) return;
+        const cw = canvas.width;
+        const ch = canvas.height;
+        const iw = img.naturalWidth;
+        const ih = img.naturalHeight;
+
+        const r = Math.max(cw / iw, ch / ih);
+        const nw = iw * r * (1 + scaleProgress * 0.08);
+        const nh = ih * r * (1 + scaleProgress * 0.08);
+        const nx = (cw - nw) / 2 + Math.sin(time * 0.5) * 15;
+        const ny = (ch - nh) / 2 + Math.cos(time * 0.4) * 10;
+
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.drawImage(img, nx, ny, nw, nh);
+        ctx.restore();
+      }
+
+      function drawOscilloscope(cw, ch) {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
+        ctx.lineWidth = 1.5;
+        ctx.shadowColor = '#38bdf8';
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        
+        const waveY = ch * 0.82;
+        const waveH = 22;
+        for (let x = 0; x < cw; x += 4) {
+          const freq1 = Math.sin((x * 0.02) + (time * 4)) * waveH;
+          const freq2 = Math.sin((x * 0.05) - (time * 2)) * (waveH * 0.4);
+          const y = waveY + freq1 + freq2;
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(239, 68, 68, 0.25)';
+        ctx.beginPath();
+        for (let x = 0; x < cw; x += 8) {
+          const y = (ch * 0.85) + Math.cos((x * 0.03) + (time * 3)) * 12;
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawDiagnosticLaser(cw, ch) {
+        laserY = (laserY + 1.2) % ch;
+        ctx.save();
+        const grad = ctx.createLinearGradient(0, laserY - 15, 0, laserY + 15);
+        grad.addColorStop(0, 'rgba(59, 130, 246, 0)');
+        grad.addColorStop(0.5, 'rgba(56, 189, 248, 0.35)');
+        grad.addColorStop(1, 'rgba(59, 130, 246, 0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, laserY - 15, cw, 30);
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, laserY);
+        ctx.lineTo(cw, laserY);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawHUDTelemetry(cw, ch) {
+        ctx.save();
+        ctx.font = '10px monospace';
+        ctx.fillStyle = 'rgba(148, 163, 184, 0.4)';
+        
+        ctx.fillText('ALFA_DSP: ONLINE [OK]', 25, 30);
+        ctx.fillText('FREQ_OUT: 60.00 Hz', 25, 45);
+        ctx.fillText('V_BUS: 560.4 VDC', 25, 60);
+
+        ctx.textAlign = 'right';
+        ctx.fillText('TEST_BENCH: Polo Club Bogotá', cw - 25, 30);
+        ctx.fillText('SELLO_ALFA: CERTIFIED', cw - 25, 45);
+        ctx.fillText('STATUS: RUNNING (60 FPS)', cw - 25, 60);
+
+        const rx = cw * 0.75;
+        const ry = ch * 0.4;
+        const rw = 90;
+        const rh = 60;
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.3)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(rx, ry, rw, rh);
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.5)';
+        ctx.fillText('CHIP_DIAG: 0xFA4', rx + rw - 5, ry + 15);
+        ctx.restore();
+      }
+
+      function renderLoop() {
+        time += 0.016;
+        const cw = canvas.width;
+        const ch = canvas.height;
+
+        ctx.clearRect(0, 0, cw, ch);
+
+        if (loadedImages.length > 0) {
+          progress += 0.003;
+
+          if (progress >= 1) {
+            progress = 0;
+            currentImgIdx = (currentImgIdx + 1) % loadedImages.length;
+            nextImgIdx = (currentImgIdx + 1) % loadedImages.length;
+          }
+
+          const currentImg = loadedImages[currentImgIdx];
+          const nextImg = loadedImages[nextImgIdx];
+
+          drawCoverImage(currentImg, progress, 1);
+
+          if (progress > 0.7) {
+            const fadeAlpha = (progress - 0.7) / 0.3;
+            drawCoverImage(nextImg, 0, fadeAlpha);
+          }
+        } else {
+          ctx.fillStyle = '#020617';
+          ctx.fillRect(0, 0, cw, ch);
+        }
+
+        drawOscilloscope(cw, ch);
+        drawDiagnosticLaser(cw, ch);
+        drawHUDTelemetry(cw, ch);
+
+        requestAnimationFrame(renderLoop);
+      }
+
+      requestAnimationFrame(renderLoop);
+    })();
+  </script>
+
 </body>
 </html>

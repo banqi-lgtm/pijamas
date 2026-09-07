@@ -1,18 +1,19 @@
 {
-  "name": "pijamas-erp",
-  "version": "1.0.0",
-  "description": "Sistema ERP de Gestión de Inventario para Tienda de Pijamas",
+  "name": "alfa-electronic-colombia",
+  "version": "2.0.0",
+  "description": "Nueva plataforma web corporativa para ALFA ELECTRONIC COLOMBIA SAS",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"
   },
-  "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
-    "express": "^4.19.2",
-    "firebase": "^12.16.0",
-    "jsonwebtoken": "^9.0.2",
-    "sqlite3": "^5.1.7"
-  }
+  "keywords": [
+    "reparacion-electronica",
+    "electronica-industrial",
+    "variadores",
+    "bogota",
+    "colombia"
+  ],
+  "author": "ALFA ELECTRONIC COLOMBIA SAS",
+  "license": "ISC"
 }
